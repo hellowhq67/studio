@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Percent, Truck, ShieldCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ProductCard from '@/components/products/ProductCard';
 
 
 const FeatureIcon = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) => (
