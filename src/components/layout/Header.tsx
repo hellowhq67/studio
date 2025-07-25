@@ -1,20 +1,35 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, User, Menu } from 'lucide-react';
+import { ShoppingBag, User, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
 import CartSheetContent from '@/components/cart/CartSheetContent';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Shop' },
-  { href: '/account', label: 'Account' },
 ];
 
 export default function Header() {
   const { itemCount } = useCart();
+  const { user, loading, logout } = useAuth();
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -33,6 +48,7 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+             {user && <Link href="/account" className="transition-colors hover:text-primary">Account</Link>}
           </nav>
         </div>
 
@@ -59,6 +75,7 @@ export default function Header() {
                             {link.label}
                         </Link>
                         ))}
+                         {user && <Link href="/account" className="transition-colors hover:text-primary text-lg">Account</Link>}
                     </nav>
                 </SheetContent>
             </Sheet>
@@ -70,12 +87,47 @@ export default function Header() {
 
 
           <nav className="flex items-center">
-            <Link href="/login">
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5 text-accent" />
-                <span className="sr-only">Account</span>
-              </Button>
-            </Link>
+            {!loading && (
+              user ? (
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                          <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/account">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Account</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={logout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+              ) : (
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Log In
+                  </Button>
+                </Link>
+              )
+            )}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
