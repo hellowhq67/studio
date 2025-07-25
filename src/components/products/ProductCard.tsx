@@ -26,9 +26,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`} className="group">
-      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-transparent hover:border-primary/20 bg-card">
+      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl border-transparent bg-card text-black">
         <CardHeader className="p-0 relative">
-          <div className="aspect-square w-full overflow-hidden rounded-t-lg">
+          <div className="aspect-square w-full overflow-hidden">
             <Image
               src={product.images[0]}
               alt={product.name}
@@ -42,15 +42,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             <Badge variant="destructive" className="absolute top-2 left-2">-{salePercentage}%</Badge>
           )}
         </CardHeader>
-        <CardContent className="p-3 flex-grow">
-          <CardTitle className="font-semibold text-sm mt-1 mb-2 leading-tight">{product.name}</CardTitle>
-        </CardContent>
-        <CardFooter className="p-3 flex justify-between items-center">
-          <div className="flex items-baseline gap-2">
-            <p className={`font-bold ${hasSale ? 'text-destructive' : ''}`}>${(hasSale ? product.salePrice : product.price)?.toFixed(2)}</p>
-            {hasSale && <p className="text-xs text-muted-foreground line-through">${product.price.toFixed(2)}</p>}
+        <CardContent className="p-4 text-center flex-grow">
+          <p className="text-xs text-gray-500 uppercase">{product.brand}</p>
+          <CardTitle className="font-semibold text-base mt-1 mb-2 leading-tight">{product.name}</CardTitle>
+          <div className="flex justify-center items-baseline gap-2">
+            <p className={`font-bold text-lg ${hasSale ? 'text-red-600' : 'text-black'}`}>${(hasSale ? product.salePrice : product.price)?.toFixed(2)}</p>
+            {hasSale && <p className="text-sm text-gray-500 line-through">${product.price.toFixed(2)}</p>}
           </div>
-        </CardFooter>
+        </CardContent>
       </Card>
     </Link>
   );

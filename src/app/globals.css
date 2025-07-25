@@ -21,7 +21,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
-    --input: 210 40% 98%;
+    --input: 217.2 32.6% 17.5%;
     --ring: 180 80% 50%;
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;
@@ -56,7 +56,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
-    --input: 210 40% 98%;
+    --input: 217.2 32.6% 17.5%;
     --ring: 180 80% 50%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -80,5 +80,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .bg-white {
+      background-color: white;
+  }
+  .text-black {
+      color: black;
   }
 }
