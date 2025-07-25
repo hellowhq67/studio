@@ -5,6 +5,7 @@ import { products as allProducts } from '@/lib/products';
 import type { Product } from '@/lib/types';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
+import PopupBanner from '@/components/home/PopupBanner';
 
 export default function Home() {
   const [filters, setFilters] = useState({
@@ -56,6 +57,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <PopupBanner />
       <header className="text-center mb-12">
         <h1 className="font-headline text-5xl md:text-6xl text-primary">Discover Your Glow</h1>
         <p className="mt-4 text-lg text-muted-foreground">High-quality beauty products curated just for you.</p>
