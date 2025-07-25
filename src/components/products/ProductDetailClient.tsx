@@ -23,6 +23,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const handleAddToCart = () => {
     addItem(product, quantity);
   };
+  
+  const hasSale = product.salePrice && product.salePrice < product.price;
 
   return (
     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
@@ -74,7 +76,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </span>
         </div>
 
-        <p className="text-3xl font-bold mb-6">${product.price.toFixed(2)}</p>
+        <div className="flex items-baseline gap-2 mb-6">
+          <p className={`text-3xl font-bold ${hasSale ? 'text-destructive' : ''}`}>${(hasSale ? product.salePrice : product.price)?.toFixed(2)}</p>
+          {hasSale && <p className="text-xl text-muted-foreground line-through">${product.price.toFixed(2)}</p>}
+        </div>
         
         <p className="text-muted-foreground leading-relaxed">{product.longDescription}</p>
         

@@ -1,80 +1,89 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { products as allProducts } from '@/lib/products';
-import type { Product } from '@/lib/types';
-import ProductGrid from '@/components/products/ProductGrid';
-import ProductFilters from '@/components/products/ProductFilters';
+import { products } from '@/lib/products';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, SlidersHorizontal } from 'lucide-react';
+import ProductCard from '@/components/products/ProductCard';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import Link from 'next/link';
 
 export default function ProductsPage() {
-  const [filters, setFilters] = useState({
-    category: 'all',
-    brand: 'all',
-    priceRange: [0, 500],
-    rating: 0,
-  });
-  const [sort, setSort] = useState('newest');
+  const discoverProducts = products.slice(0, 6);
+  const newArrivals = products.slice(6, 12);
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let products: Product[] = [...allProducts];
-
-    products = products.filter((product) => {
-      const categoryMatch = filters.category === 'all' || product.category === filters.category;
-      const brandMatch = filters.brand === 'all' || product.brand === filters.brand;
-      const priceMatch = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1];
-      const ratingMatch = product.rating >= filters.rating;
-      return categoryMatch && brandMatch && priceMatch && ratingMatch;
-    });
-
-    switch (sort) {
-      case 'price-asc':
-        products.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        products.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating-desc':
-        products.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-      default:
-        // Assuming the original order is newest first.
-        break;
-    }
-
-    return products;
-  }, [filters, sort]);
-
-  const handleFilterChange = useCallback((newFilters: Partial<typeof filters>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-  }, []);
-
-  const uniqueCategories = useMemo(() => ['all', ...Array.from(new Set(allProducts.map((p) => p.category)))], []);
-  const uniqueBrands = useMemo(() => ['all', ...Array.from(new Set(allProducts.map((p) => p.brand)))], []);
-  
-  const maxPrice = useMemo(() => Math.max(...allProducts.map(p => p.price)), []);
+  const searchHistory = ["Brow Pencil", "Glow Foundation", "Matte Lipstick", "Primer Serum", "Blush Stick"];
+  const recommendations = ["Blush Stick", "Brow Pencil", "Setting Spray", "Primer Serum", "Face Mask", "Glow Foundation"];
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <header className="text-center mb-12">
-        <h1 className="font-headline text-5xl md:text-6xl text-primary">Shop All Products</h1>
-        <p className="mt-4 text-lg text-muted-foreground">High-quality beauty products curated just for you.</p>
-      </header>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <aside className="lg:col-span-1">
-          <ProductFilters
-            categories={uniqueCategories}
-            brands={uniqueBrands}
-            onFilterChange={handleFilterChange}
-            onSortChange={setSort}
-            maxPrice={maxPrice}
-            filters={filters}
-          />
-        </aside>
-        <section className="lg:col-span-3">
-          <ProductGrid products={filteredAndSortedProducts} />
-        </section>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="relative flex-grow">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input placeholder="Search..." className="pl-10 h-12" />
+        </div>
+        <Button variant="outline" size="icon" className="h-12 w-12">
+          <SlidersHorizontal className="h-5 w-5" />
+        </Button>
       </div>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-bold mb-3">Search history</h2>
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {searchHistory.map(item => (
+                <Button key={item} variant="outline" className="rounded-full whitespace-nowrap">{item}</Button>
+            ))}
+        </div>
+      </section>
+
+       <section className="mb-8">
+        <h2 className="text-xl font-bold mb-3">Recommendations</h2>
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {recommendations.map(item => (
+                <Button key={item} variant="outline" className="rounded-full whitespace-nowrap">{item}</Button>
+            ))}
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Discover</h2>
+           <Link href="#" className="text-primary font-semibold">View all</Link>
+        </div>
+        <Carousel opts={{
+          align: "start",
+          loop: true,
+        }}
+        className="w-full">
+          <CarouselContent>
+            {discoverProducts.map((product, index) => (
+              <CarouselItem key={index} className="basis-1/2 md:basis-1/3 lg:basis-1/4">
+                <ProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex" />
+          <CarouselNext className="hidden md:flex" />
+        </Carousel>
+      </section>
+
+      <section>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">New Arrivals</h2>
+           <Link href="#" className="text-primary font-semibold">View all</Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {newArrivals.slice(0,4).map(product => (
+                <ProductCard key={product.id} product={product} />
+            ))}
+        </div>
+      </section>
     </div>
   );
 }

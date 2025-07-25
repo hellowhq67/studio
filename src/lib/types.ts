@@ -5,6 +5,7 @@ export interface Product {
   description: string;
   longDescription: string;
   price: number;
+  salePrice?: number;
   rating: number;
   reviewCount: number;
   category: 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';

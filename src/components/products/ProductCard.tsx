@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
 import { Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ProductCardProps {
   product: Product;
@@ -20,11 +21,14 @@ export default function ProductCard({ product }: ProductCardProps) {
     addItem(product, 1);
   };
 
+  const hasSale = product.salePrice && product.salePrice < product.price;
+  const salePercentage = hasSale ? Math.round(((product.price - product.salePrice!) / product.price) * 100) : 0;
+
   return (
     <Link href={`/products/${product.id}`} className="group">
-      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-transparent hover:border-primary/20">
-        <CardHeader className="p-0">
-          <div className="aspect-square w-full overflow-hidden">
+      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-transparent hover:border-primary/20 bg-card">
+        <CardHeader className="p-0 relative">
+          <div className="aspect-square w-full overflow-hidden rounded-t-lg">
             <Image
               src={product.images[0]}
               alt={product.name}
@@ -34,24 +38,18 @@ export default function ProductCard({ product }: ProductCardProps) {
               data-ai-hint={`${product.category} product`}
             />
           </div>
+          {hasSale && (
+            <Badge variant="destructive" className="absolute top-2 left-2">-{salePercentage}%</Badge>
+          )}
         </CardHeader>
-        <CardContent className="p-4 flex-grow">
-          <p className="text-sm text-muted-foreground">{product.brand}</p>
-          <CardTitle className="font-headline text-lg mt-1 mb-2 leading-tight">{product.name}</CardTitle>
-          <div className="flex items-center">
-            <div className="flex items-center text-accent">
-                {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-transparent stroke-current'}`} />
-                ))}
-            </div>
-            <span className="text-xs text-muted-foreground ml-2">({product.reviewCount})</span>
-          </div>
+        <CardContent className="p-3 flex-grow">
+          <CardTitle className="font-semibold text-sm mt-1 mb-2 leading-tight">{product.name}</CardTitle>
         </CardContent>
-        <CardFooter className="p-4 flex justify-between items-center">
-          <p className="font-semibold text-lg">${product.price.toFixed(2)}</p>
-          <Button onClick={handleAddToCart} variant="secondary" className="bg-accent/20 hover:bg-accent/40 text-accent-foreground">
-            Add to Cart
-          </Button>
+        <CardFooter className="p-3 flex justify-between items-center">
+          <div className="flex items-baseline gap-2">
+            <p className={`font-bold ${hasSale ? 'text-destructive' : ''}`}>${(hasSale ? product.salePrice : product.price)?.toFixed(2)}</p>
+            {hasSale && <p className="text-xs text-muted-foreground line-through">${product.price.toFixed(2)}</p>}
+          </div>
         </CardFooter>
       </Card>
     </Link>
