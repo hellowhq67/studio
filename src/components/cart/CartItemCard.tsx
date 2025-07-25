@@ -13,6 +13,7 @@ interface CartItemCardProps {
 
 export default function CartItemCard({ item }: CartItemCardProps) {
   const { updateQuantity, removeItem } = useCart();
+  const displayPrice = item.product.salePrice ?? item.product.price;
 
   return (
     <div className="flex items-start space-x-4 p-2 rounded-lg border border-border">
@@ -35,8 +36,9 @@ export default function CartItemCard({ item }: CartItemCardProps) {
             value={item.quantity}
             onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value, 10))}
             className="w-16 h-8 text-center"
+            aria-label="Quantity"
           />
-           <p className="ml-auto font-semibold text-sm">${(item.product.price * item.quantity).toFixed(2)}</p>
+           <p className="ml-auto font-semibold text-sm">${(displayPrice * item.quantity).toFixed(2)}</p>
         </div>
       </div>
       <Button
@@ -44,6 +46,7 @@ export default function CartItemCard({ item }: CartItemCardProps) {
         size="icon"
         className="text-muted-foreground hover:text-destructive w-8 h-8 flex-shrink-0"
         onClick={() => removeItem(item.product.id)}
+        aria-label="Remove item"
       >
         <X className="w-4 h-4" />
       </Button>

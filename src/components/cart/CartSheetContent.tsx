@@ -6,17 +6,21 @@ import { SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@/components/u
 import { ScrollArea } from '@/components/ui/scroll-area';
 import CartItemCard from './CartItemCard';
 import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Loader2 } from 'lucide-react';
 
 export default function CartSheetContent() {
-  const { items, cartTotal, itemCount } = useCart();
+  const { items, cartTotal, itemCount, loading } = useCart();
 
   return (
     <>
       <SheetHeader>
         <SheetTitle className="font-headline text-2xl">My Cart ({itemCount})</SheetTitle>
       </SheetHeader>
-      {items.length > 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : items.length > 0 ? (
         <div className="flex flex-col h-full">
           <ScrollArea className="flex-grow pr-4 -mr-4 my-4">
             <div className="space-y-4">
@@ -32,7 +36,7 @@ export default function CartSheetContent() {
                 <span>${cartTotal.toFixed(2)}</span>
               </div>
               <SheetClose asChild>
-                <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={items.length === 0}>
                     <Link href="/checkout">Proceed to Checkout</Link>
                 </Button>
               </SheetClose>

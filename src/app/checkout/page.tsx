@@ -7,14 +7,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handlePayment = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate payment processing
+    toast({
+      title: 'Processing Payment...',
+      description: 'Please wait while we process your order.',
+    });
     setTimeout(() => {
       clearCart();
       router.push('/checkout/success');
@@ -101,13 +107,15 @@ export default function CheckoutPage() {
               {items.map(item => (
                 <div key={item.product.id} className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <Image src={item.product.images[0]} alt={item.product.name} width={64} height={64} className="rounded-md" />
+                    <div className="relative w-16 h-16">
+                      <Image src={item.product.images[0]} alt={item.product.name} fill className="rounded-md object-cover" />
+                    </div>
                     <div>
                       <p className="font-semibold">{item.product.name}</p>
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                   </div>
-                  <p className="font-semibold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-semibold">${((item.product.salePrice ?? item.product.price) * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </CardContent>
