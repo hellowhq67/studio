@@ -8,7 +8,8 @@ import { useCart } from '@/hooks/useCart';
 import CartSheetContent from '@/components/cart/CartSheetContent';
 
 const navLinks = [
-  { href: '/', label: 'Shop' },
+  { href: '/', label: 'Home' },
+  { href: '/products', label: 'Shop' },
   { href: '/account', label: 'Account' },
 ];
 
