@@ -22,26 +22,20 @@ export default function Footer() {
             </ul>
           </div>
           <div>
+            <h4 className="font-semibold text-white mb-4">Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/privacy-policy" className="hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="hover:text-primary">Terms of Service</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-primary">Refund Policy</Link></li>
+            </ul>
+          </div>
+          <div>
             <h4 className="font-semibold text-white mb-4">Contact Details</h4>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> <span>support@glowup.com</span></li>
               <li className="flex items-center gap-2"><Phone className="w-4 h-4 text-primary" /> <span>(555) 123-4567</span></li>
               <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> <span>123 Glow St, Beautyville</span></li>
             </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-white mb-4">Follow Us</h4>
-             <div className="flex space-x-4 mt-4 md:mt-0">
-              <Link href="#" className="text-gray-400 hover:text-primary">
-                Instagram
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-primary">
-                Facebook
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-primary">
-                Twitter
-              </Link>
-            </div>
           </div>
         </div>
         <div className="mt-8 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
