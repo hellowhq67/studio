@@ -41,6 +41,9 @@ export default function PopupBanner() {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-gray-900 border-gray-800 text-white p-0 max-w-2xl rounded-lg overflow-hidden">
+         <DialogHeader>
+            <DialogTitle className="sr-only">Exclusive Offer</DialogTitle>
+         </DialogHeader>
          <Button
             variant="ghost"
             size="icon"
@@ -60,9 +63,7 @@ export default function PopupBanner() {
                 />
             </div>
             <div className="p-8 flex flex-col justify-center items-start">
-                <DialogHeader>
-                    <DialogTitle className="font-headline text-3xl md:text-4xl text-primary mb-3">Exclusive Offer</DialogTitle>
-                </DialogHeader>
+                <h2 className="font-headline text-3xl md:text-4xl text-primary mb-3">Exclusive Offer</h2>
                 <p className="text-gray-300 mb-6">
                     Sign up today and get <span className="text-accent font-bold">25% OFF</span> your first order. Discover your new favorite beauty essentials.
                 </p>

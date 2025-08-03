@@ -17,7 +17,7 @@ export default function CartSheetContent() {
   return (
     <>
       <SheetHeader>
-        <SheetTitle className={cn("font-headline text-2xl", items.length === 0 && 'sr-only')}>My Cart ({itemCount})</SheetTitle>
+        <SheetTitle className={cn("font-headline text-2xl", { "sr-only": items.length === 0 })}>My Cart ({itemCount})</SheetTitle>
       </SheetHeader>
       {loading ? (
         <div className="flex items-center justify-center h-full">
