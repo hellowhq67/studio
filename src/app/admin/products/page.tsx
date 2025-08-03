@@ -7,6 +7,7 @@ import { PlusCircle, MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 export default function AdminProductsPage() {
   return (
@@ -17,9 +18,11 @@ export default function AdminProductsPage() {
             <CardTitle>Products</CardTitle>
             <CardDescription>Manage your products and view their sales performance.</CardDescription>
           </div>
-          <Button size="sm" className="gap-1">
-            <PlusCircle className="h-4 w-4" />
-            <span>Add Product</span>
+          <Button size="sm" className="gap-1" asChild>
+            <Link href="/admin/products/new">
+              <PlusCircle className="h-4 w-4" />
+              <span>Add Product</span>
+            </Link>
           </Button>
         </div>
       </CardHeader>
