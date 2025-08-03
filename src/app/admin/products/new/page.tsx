@@ -1,5 +1,5 @@
 'use client';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -33,7 +33,7 @@ type ProductFormValues = z.infer<typeof ProductSchema>;
 
 export default function AddProductPage() {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(addProduct, initialState);
+  const [state, dispatch] = useActionState(addProduct, initialState);
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(ProductSchema),
      defaultValues: {
