@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import CartItemCard from './CartItemCard';
 import Link from 'next/link';
 import { ShoppingBag, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function CartSheetContent() {
   const { items, cartTotal, itemCount, loading } = useCart();
@@ -14,7 +15,7 @@ export default function CartSheetContent() {
   return (
     <>
       <SheetHeader>
-        <SheetTitle className="font-headline text-2xl">My Cart ({itemCount})</SheetTitle>
+        <SheetTitle className={cn("font-headline text-2xl", items.length === 0 && 'sr-only')}>My Cart ({itemCount})</SheetTitle>
       </SheetHeader>
       {loading ? (
         <div className="flex items-center justify-center h-full">
