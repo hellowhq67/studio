@@ -17,47 +17,50 @@ export default function CartSheetContent() {
   return (
     <>
       <SheetHeader>
-        <SheetTitle className={cn("font-headline text-2xl", { "sr-only": items.length === 0 })}>My Cart ({itemCount})</SheetTitle>
+        <SheetTitle>My Cart ({itemCount})</SheetTitle>
       </SheetHeader>
-      {loading ? (
-        <div className="flex items-center justify-center h-full">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : items.length > 0 ? (
-        <div className="flex flex-col h-full">
-          <ScrollArea className="flex-grow pr-4 -mr-4 my-4">
-            <div className="space-y-4">
-              {items.map((item) => (
-                <CartItemCard key={item.product.id} item={item} />
-              ))}
+      
+      <div className="flex flex-col h-full">
+        {loading ? (
+            <div className="flex items-center justify-center flex-grow">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
-          </ScrollArea>
-          <SheetFooter className="mt-auto">
-            <div className="w-full space-y-4">
-              <div className="flex justify-between font-bold text-lg">
-                <span>Subtotal</span>
-                <span>{formatPrice(cartTotal)}</span>
+        ) : items.length > 0 ? (
+          <>
+            <ScrollArea className="flex-grow pr-4 -mr-4 my-4">
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <CartItemCard key={item.product.id} item={item} />
+                ))}
               </div>
-              <SheetClose asChild>
-                <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={items.length === 0}>
-                    <Link href="/checkout">Proceed to Checkout</Link>
-                </Button>
+            </ScrollArea>
+            <SheetFooter className="mt-auto">
+              <div className="w-full space-y-4">
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(cartTotal)}</span>
+                </div>
+                <SheetClose asChild>
+                  <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={items.length === 0}>
+                      <Link href="/checkout">Proceed to Checkout</Link>
+                  </Button>
+                </SheetClose>
+              </div>
+            </SheetFooter>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center flex-grow">
+              <ShoppingBag className="w-20 h-20 text-muted-foreground/50 mb-4" />
+            <p className="font-headline text-xl text-muted-foreground">Your cart is empty</p>
+            <p className="text-muted-foreground">Add some products to get started.</p>
+            <SheetClose asChild>
+                  <Button asChild variant="link" className="text-primary mt-4">
+                      <Link href="/">Continue Shopping</Link>
+                  </Button>
               </SheetClose>
-            </div>
-          </SheetFooter>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-            <ShoppingBag className="w-20 h-20 text-muted-foreground/50 mb-4" />
-          <p className="font-headline text-xl text-muted-foreground">Your cart is empty</p>
-          <p className="text-muted-foreground">Add some products to get started.</p>
-           <SheetClose asChild>
-                <Button asChild variant="link" className="text-primary mt-4">
-                    <Link href="/">Continue Shopping</Link>
-                </Button>
-            </SheetClose>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </>
   );
 }
