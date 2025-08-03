@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, User, Menu, LogOut } from 'lucide-react';
+import { ShoppingBag, User, Menu, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
@@ -112,6 +112,12 @@ export default function Header() {
                         <Link href="/account">
                           <User className="mr-2 h-4 w-4" />
                           <span>Account</span>
+                        </Link>
+                      </DropdownMenuItem>
+                       <DropdownMenuItem asChild>
+                        <Link href="/admin">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={logout}>
