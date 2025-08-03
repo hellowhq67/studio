@@ -1,15 +1,38 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { products } from '@/lib/products';
-import { PlusCircle, MoreHorizontal } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import type { Product } from '@/lib/types';
 
 export default function AdminProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching products: ", error);
+        // Handle error (e.g., show a toast message)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -27,6 +50,11 @@ export default function AdminProductsPage() {
         </div>
       </CardHeader>
       <CardContent>
+        {loading ? (
+          <div className="flex justify-center items-center h-48">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -57,7 +85,7 @@ export default function AdminProductsPage() {
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">Active</Badge>
+                  <Badge variant="outline">{product.quantity > 0 ? 'In Stock' : 'Out of Stock'}</Badge>
                 </TableCell>
                 <TableCell>${(product.salePrice ?? product.price).toFixed(2)}</TableCell>
                 <TableCell className="hidden md:table-cell">{product.brand}</TableCell>
@@ -81,6 +109,7 @@ export default function AdminProductsPage() {
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
   );
