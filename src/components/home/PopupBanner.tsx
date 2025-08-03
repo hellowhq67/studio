@@ -54,7 +54,7 @@ export default function PopupBanner() {
         <div className="grid grid-cols-1 md:grid-cols-2">
             <div className="relative h-64 md:h-full">
                  <Image
-                    src="https://placehold.co/600x800.png"
+                    src="https://storage.googleapis.com/gemini-studio-assets/project-images/7f9408d2-45e0-41a4-972d-419b49b3d76e.jpeg"
                     alt="Special Offer"
                     fill
                     className="object-cover"

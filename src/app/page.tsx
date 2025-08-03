@@ -30,7 +30,7 @@ export default function Home() {
       <section className="relative h-[70vh] bg-gray-900 text-white flex items-center">
         <div className="absolute inset-0">
             <Image
-            src="https://placehold.co/1920x1080.png"
+            src="https://storage.googleapis.com/gemini-studio-assets/project-images/b4893708-5d25-4504-86dd-e13768b99529.jpeg"
             alt="Beauty campaign"
             layout="fill"
             objectFit="cover"
@@ -70,7 +70,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
              <div className="relative aspect-square">
-                 <Image src="https://placehold.co/600x600.png" alt="A whole new look" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="natural beauty product"/>
+                 <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/3494792d-c14e-4e4b-9e4a-57a5db740e50.jpeg" alt="A whole new look" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="natural beauty product"/>
              </div>
              <div className="text-left">
                 <p className="text-sm text-primary font-semibold uppercase tracking-widest">So mild so divine</p>
@@ -103,7 +103,7 @@ export default function Home() {
                     </blockquote>
                     <div className="flex items-center gap-4">
                         <Avatar>
-                            <AvatarImage src="https://placehold.co/100x100.png" alt="Yusra Miller" />
+                            <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/2a77a944-a1dc-413c-a815-5606d2d78707.jpeg" alt="Yusra Miller" />
                             <AvatarFallback>YM</AvatarFallback>
                         </Avatar>
                         <div>
@@ -113,7 +113,7 @@ export default function Home() {
                     </div>
                 </div>
                  <div className="relative aspect-square">
-                    <Image src="https://placehold.co/600x600.png" alt="Happy client" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="woman smiling beauty"/>
+                    <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/593e105e-8533-455b-862d-966952763f92.jpeg" alt="Happy client" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="woman smiling beauty"/>
                  </div>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function Home() {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-16 bg-cover bg-center" style={{ backgroundImage: "url('https://placehold.co/1920x400.png')" }}>
+      <section className="py-16 bg-cover bg-center" style={{ backgroundImage: "url('https://storage.googleapis.com/gemini-studio-assets/project-images/b9800e2b-2357-410a-ae42-95a2b8510c4d.jpeg')" }}>
          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
             <h2 className="font-headline text-4xl">Sign-Up The Makeup Fan Club</h2>
             <p className="text-gray-300 my-4 max-w-2xl mx-auto">Join our fan club to receive exclusive offers, new product announcements, and beauty tips straight to your inbox.</p>

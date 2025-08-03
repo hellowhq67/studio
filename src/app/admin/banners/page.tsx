@@ -25,7 +25,7 @@ export default function AdminBannersPage() {
           <div className="space-y-2">
             <Label>Current Image</Label>
             <div className="relative aspect-video w-full max-w-sm rounded-md overflow-hidden">
-                <Image src="https://placehold.co/1920x1080.png" alt="Hero banner" fill className="object-cover" />
+                <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/b4893708-5d25-4504-86dd-e13768b99529.jpeg" alt="Hero banner" fill className="object-cover" />
             </div>
           </div>
           <div className="space-y-2">
@@ -45,7 +45,7 @@ export default function AdminBannersPage() {
            <div className="space-y-2">
             <Label>Current Image</Label>
             <div className="relative aspect-[4.8/1] w-full max-w-lg rounded-md overflow-hidden">
-                <Image src="https://placehold.co/1920x400.png" alt="Newsletter banner" fill className="object-cover" />
+                <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/b9800e2b-2357-410a-ae42-95a2b8510c4d.jpeg" alt="Newsletter banner" fill className="object-cover" />
             </div>
           </div>
           <div className="space-y-2">

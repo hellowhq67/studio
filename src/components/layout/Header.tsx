@@ -22,6 +22,12 @@ const navLinks = [
   { href: '/products', label: 'Shop' },
 ];
 
+const Logo = () => (
+  <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 10C27.9086 10 10 27.9086 10 50C10 72.0914 27.9086 90 50 90V82C32.3269 82 18 67.6731 18 50C18 32.3269 32.3269 18 50 18C67.6731 18 82 32.3269 82 50C82 59.2367 77.876 67.5213 71.2132 73.1237L65.5563 67.4668C70.7397 63.0476 74 56.8624 74 50C74 36.7452 63.2548 26 50 26C36.7452 26 26 36.7452 26 50C26 63.2548 36.7452 74 50 74V66C41.1634 66 34 58.8366 34 50C34 41.1634 41.1634 34 50 34C58.8366 34 66 41.1634 66 50H90C90 27.9086 72.0914 10 50 10Z" fill="hsl(var(--primary))"/>
+  </svg>
+)
+
 export default function Header() {
   const { itemCount } = useCart();
   const { user, loading, logout } = useAuth();
@@ -36,6 +42,7 @@ export default function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Logo />
             <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
@@ -63,6 +70,7 @@ export default function Header() {
                 </SheetTrigger>
                 <SheetContent side="left">
                     <Link href="/" className="mr-6 flex items-center space-x-2 mb-4">
+                        <Logo />
                         <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
                     </Link>
                     <nav className="flex flex-col space-y-4">
@@ -82,6 +90,7 @@ export default function Header() {
           </div>
           
            <Link href="/" className="flex items-center space-x-2 md:hidden">
+            <Logo />
             <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
           </Link>
 
