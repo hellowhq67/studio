@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 
@@ -53,11 +52,10 @@ export default function PopupBanner() {
           </Button>
         <div className="grid grid-cols-1 md:grid-cols-2">
             <div className="relative h-64 md:h-full">
-                 <Image
+                 <img
                     src="https://storage.googleapis.com/gemini-studio-assets/project-images/7f9408d2-45e0-41a4-972d-419b49b3d76e.jpeg"
                     alt="Special Offer"
-                    fill
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                     data-ai-hint="luxury beauty model"
                 />
             </div>

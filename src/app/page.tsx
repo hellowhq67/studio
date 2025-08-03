@@ -2,7 +2,6 @@ import { products } from '@/lib/products';
 import ProductGrid from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Percent, Truck, ShieldCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,12 +28,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[70vh] bg-gray-900 text-white flex items-center">
         <div className="absolute inset-0">
-            <Image
+            <img
             src="https://storage.googleapis.com/gemini-studio-assets/project-images/b4893708-5d25-4504-86dd-e13768b99529.jpeg"
             alt="Beauty campaign"
-            layout="fill"
-            objectFit="cover"
-            className="opacity-40"
+            className="w-full h-full object-cover opacity-40"
             data-ai-hint="beauty model face"
             />
         </div>
@@ -70,7 +67,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
              <div className="relative aspect-square">
-                 <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/3494792d-c14e-4e4b-9e4a-57a5db740e50.jpeg" alt="A whole new look" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="natural beauty product"/>
+                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/3494792d-c14e-4e4b-9e4a-57a5db740e50.jpeg" alt="A whole new look" className="object-cover w-full h-full rounded-lg shadow-lg" data-ai-hint="natural beauty product"/>
              </div>
              <div className="text-left">
                 <p className="text-sm text-primary font-semibold uppercase tracking-widest">So mild so divine</p>
@@ -113,7 +110,7 @@ export default function Home() {
                     </div>
                 </div>
                  <div className="relative aspect-square">
-                    <Image src="https://storage.googleapis.com/gemini-studio-assets/project-images/593e105e-8533-455b-862d-966952763f92.jpeg" alt="Happy client" fill className="object-cover rounded-lg shadow-lg" data-ai-hint="woman smiling beauty"/>
+                    <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/593e105e-8533-455b-862d-966952763f92.jpeg" alt="Happy client" className="object-cover w-full h-full rounded-lg shadow-lg" data-ai-hint="woman smiling beauty"/>
                  </div>
             </div>
           </div>

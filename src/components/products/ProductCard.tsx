@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/products/${product.id}`} className="contents">
         <CardHeader className="p-0 relative">
           <div className="aspect-square w-full overflow-hidden">
-            <Image
+            <img
               src={product.images[0]}
               alt={product.name}
               width={600}

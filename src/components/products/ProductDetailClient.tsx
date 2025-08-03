@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
@@ -30,7 +29,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
       <div className="grid gap-4">
         <div className="aspect-square w-full overflow-hidden rounded-lg shadow-lg">
-          <Image
+          <img
             src={activeImage}
             alt={product.name}
             width={800}
@@ -47,7 +46,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 className={`aspect-square w-full rounded-md overflow-hidden ring-offset-background ring-2 ${activeImage === img ? 'ring-primary' : 'ring-transparent'}`}
                 onClick={() => setActiveImage(img)}
               >
-                <Image
+                <img
                   src={img}
                   alt={`${product.name} thumbnail ${idx + 1}`}
                   width={200}

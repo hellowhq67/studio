@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import type { CartItem } from '@/lib/types';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
@@ -18,11 +17,10 @@ export default function CartItemCard({ item }: CartItemCardProps) {
   return (
     <div className="flex items-start space-x-4 p-2 rounded-lg border border-border">
       <div className="w-20 h-20 relative flex-shrink-0">
-        <Image
+        <img
           src={item.product.images[0]}
           alt={item.product.name}
-          fill
-          className="rounded-md object-cover"
+          className="rounded-md object-cover w-full h-full"
           data-ai-hint={`${item.product.category} product`}
         />
       </div>

@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CheckoutPage() {
@@ -107,8 +106,8 @@ export default function CheckoutPage() {
               {items.map(item => (
                 <div key={item.product.id} className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <div className="relative w-16 h-16">
-                      <Image src={item.product.images[0]} alt={item.product.name} fill className="rounded-md object-cover" />
+                    <div className="relative w-16 h-16 rounded-md overflow-hidden">
+                      <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <p className="font-semibold">{item.product.name}</p>
