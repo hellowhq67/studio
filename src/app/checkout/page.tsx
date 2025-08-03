@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -114,14 +116,14 @@ export default function CheckoutPage() {
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                   </div>
-                  <p className="font-semibold">${((item.product.salePrice ?? item.product.price) * item.quantity).toFixed(2)}</p>
+                  <p className="font-semibold">{formatPrice((item.product.salePrice ?? item.product.price) * item.quantity)}</p>
                 </div>
               ))}
             </CardContent>
             <CardFooter className="flex-col items-stretch space-y-4">
                 <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${cartTotal.toFixed(2)}</span>
+                    <span>{formatPrice(cartTotal)}</span>
                 </div>
                 <Button type="submit" form="payment-form" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                     Pay Now

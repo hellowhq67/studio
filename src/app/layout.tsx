@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { AuthProvider } from '@/hooks/useAuth';
 import { Inter } from 'next/font/google';
+import { CurrencyProvider } from '@/hooks/useCurrency';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -28,11 +29,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </CartProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </CartProvider>
+          </CurrencyProvider>
         </AuthProvider>
         <Toaster />
       </body>

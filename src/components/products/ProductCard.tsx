@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +16,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,8 +62,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-xs text-muted-foreground uppercase">{product.brand}</p>
           <CardTitle className="font-semibold text-base mt-1 mb-2 leading-tight">{product.name}</CardTitle>
           <div className="flex justify-center items-baseline gap-2">
-            <p className={`font-bold text-lg ${hasSale ? 'text-destructive' : ''}`}>${displayPrice?.toFixed(2)}</p>
-            {hasSale && <p className="text-sm text-muted-foreground line-through">${product.price.toFixed(2)}</p>}
+            <p className={`font-bold text-lg ${hasSale ? 'text-destructive' : ''}`}>{formatPrice(displayPrice ?? 0)}</p>
+            {hasSale && <p className="text-sm text-muted-foreground line-through">{formatPrice(product.price)}</p>}
           </div>
         </CardContent>
       </Link>

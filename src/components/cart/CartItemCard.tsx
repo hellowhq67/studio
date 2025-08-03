@@ -5,6 +5,7 @@ import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -12,6 +13,7 @@ interface CartItemCardProps {
 
 export default function CartItemCard({ item }: CartItemCardProps) {
   const { updateQuantity, removeItem } = useCart();
+  const { formatPrice } = useCurrency();
   const displayPrice = item.product.salePrice ?? item.product.price;
 
   return (
@@ -36,7 +38,7 @@ export default function CartItemCard({ item }: CartItemCardProps) {
             className="w-16 h-8 text-center"
             aria-label="Quantity"
           />
-           <p className="ml-auto font-semibold text-sm">${(displayPrice * item.quantity).toFixed(2)}</p>
+           <p className="ml-auto font-semibold text-sm">{formatPrice(displayPrice * item.quantity)}</p>
         </div>
       </div>
       <Button

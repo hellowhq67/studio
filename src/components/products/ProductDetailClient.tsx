@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
 import { Star, ShoppingBag, Minus, Plus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.images[0]);
 
@@ -24,6 +26,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   };
   
   const hasSale = product.salePrice && product.salePrice < product.price;
+  const displayPrice = hasSale ? product.salePrice : product.price;
 
   return (
     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
@@ -76,8 +79,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
 
         <div className="flex items-baseline gap-2 mb-6">
-          <p className={`text-3xl font-bold ${hasSale ? 'text-destructive' : ''}`}>${(hasSale ? product.salePrice : product.price)?.toFixed(2)}</p>
-          {hasSale && <p className="text-xl text-muted-foreground line-through">${product.price.toFixed(2)}</p>}
+          <p className={`text-3xl font-bold ${hasSale ? 'text-destructive' : ''}`}>{formatPrice(displayPrice ?? 0)}</p>
+          {hasSale && <p className="text-xl text-muted-foreground line-through">{formatPrice(product.price)}</p>}
         </div>
         
         <p className="text-muted-foreground leading-relaxed">{product.longDescription}</p>

@@ -8,9 +8,11 @@ import CartItemCard from './CartItemCard';
 import Link from 'next/link';
 import { ShoppingBag, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function CartSheetContent() {
   const { items, cartTotal, itemCount, loading } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <>
@@ -34,7 +36,7 @@ export default function CartSheetContent() {
             <div className="w-full space-y-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Subtotal</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>{formatPrice(cartTotal)}</span>
               </div>
               <SheetClose asChild>
                 <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={items.length === 0}>

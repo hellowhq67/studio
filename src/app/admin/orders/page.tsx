@@ -6,11 +6,11 @@ import { MoreHorizontal, File } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 
 const mockOrders = [
-  { id: 'ORD001', customer: 'Liam Johnson', email: 'liam@example.com', date: '2023-06-23', status: 'Fulfilled', total: '$250.00' },
-  { id: 'ORD002', customer: 'Olivia Smith', email: 'olivia@example.com', date: '2023-06-24', status: 'Fulfilled', total: '$150.00' },
-  { id: 'ORD003', customer: 'Noah Williams', email: 'noah@example.com', date: '2023-06-25', status: 'Unfulfilled', total: '$350.00' },
-  { id: 'ORD004', customer: 'Emma Brown', email: 'emma@example.com', date: '2023-06-26', status: 'Fulfilled', total: '$450.00' },
-  { id: 'ORD005', customer: 'Ava Jones', email: 'ava@example.com', date: '2023-06-27', status: 'Unfulfilled', total: '$550.00' },
+  { id: 'ORD001', customer: 'Liam Johnson', email: 'liam@example.com', date: '2023-06-23', status: 'Fulfilled', total: 250.00 },
+  { id: 'ORD002', customer: 'Olivia Smith', email: 'olivia@example.com', date: '2023-06-24', status: 'Fulfilled', total: 150.00 },
+  { id: 'ORD003', customer: 'Noah Williams', email: 'noah@example.com', date: '2023-06-25', status: 'Unfulfilled', total: 350.00 },
+  { id: 'ORD004', customer: 'Emma Brown', email: 'emma@example.com', date: '2023-06-26', status: 'Fulfilled', total: 450.00 },
+  { id: 'ORD005', customer: 'Ava Jones', email: 'ava@example.com', date: '2023-06-27', status: 'Unfulfilled', total: 550.00 },
 ];
 
 export default function AdminOrdersPage() {
@@ -54,7 +54,7 @@ export default function AdminOrdersPage() {
                 <TableCell className="hidden md:table-cell">
                   <Badge variant={order.status === 'Fulfilled' ? 'default' : 'secondary'}>{order.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right">{order.total}</TableCell>
+                <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

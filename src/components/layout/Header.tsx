@@ -16,6 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useCurrency } from '@/hooks/useCurrency';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -23,10 +26,26 @@ const navLinks = [
 ];
 
 const Logo = () => (
-  <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M50 10C27.9086 10 10 27.9086 10 50C10 72.0914 27.9086 90 50 90V82C32.3269 82 18 67.6731 18 50C18 32.3269 32.3269 18 50 18C67.6731 18 82 32.3269 82 50C82 59.2367 77.876 67.5213 71.2132 73.1237L65.5563 67.4668C70.7397 63.0476 74 56.8624 74 50C74 36.7452 63.2548 26 50 26C36.7452 26 26 36.7452 26 50C26 63.2548 36.7452 74 50 74V66C41.1634 66 34 58.8366 34 50C34 41.1634 41.1634 34 50 34C58.8366 34 66 41.1634 66 50H90C90 27.9086 72.0914 10 50 10Z" fill="hsl(var(--primary))"/>
-  </svg>
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 10C27.9086 10 10 27.9086 10 50C10 72.0914 27.9086 90 50 90V82C32.3269 82 18 67.6731 18 50C18 32.3269 32.3269 18 50 18C67.6731 18 82 32.3269 82 50C82 59.2367 77.876 67.5213 71.2132 73.1237L65.5563 67.4668C70.7397 63.0476 74 56.8624 74 50C74 36.7452 63.2548 26 50 26C36.7452 26 26 36.7452 26 50C26 63.2548 36.7452 74 50 74V66C41.1634 66 34 58.8366 34 50C34 41.1634 41.1634 34 50 34C58.8366 34 66 41.1634 66 50H90C90 27.9086 72.0914 10 50 10Z" fill="hsl(var(--primary))"/>
+    </svg>
 )
+
+const CurrencySwitcher = () => {
+    const { currency, setCurrency } = useCurrency();
+
+    return (
+        <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger className="w-auto h-9 text-sm bg-transparent border-0 shadow-none focus:ring-0">
+                <SelectValue placeholder="Currency" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="USD">USD ($)</SelectItem>
+                <SelectItem value="BDT">BDT (৳)</SelectItem>
+            </SelectContent>
+        </Select>
+    )
+}
 
 export default function Header() {
   const { itemCount } = useCart();
@@ -96,6 +115,7 @@ export default function Header() {
 
 
           <nav className="flex items-center">
+            <CurrencySwitcher />
             {!loading && (
               user ? (
                  <DropdownMenu>
