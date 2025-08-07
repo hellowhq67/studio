@@ -26,7 +26,7 @@ const ProductSchema = z.object({
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
   brand: z.string().min(1, 'Brand is required'),
-  images: z.any().refine((files) => files?.length >= 1, 'At least one image is required.'),
+  images: z.string().min(1, 'At least one image URL is required (comma-separated)'),
 });
 
 type ProductFormValues = z.infer<typeof ProductSchema>;
@@ -50,7 +50,7 @@ export default function AddProductPage() {
       deliveryTime: '',
       category: 'Skincare',
       brand: '',
-      images: undefined
+      images: ''
     },
   });
 
@@ -108,11 +108,11 @@ export default function AddProductPage() {
                   <FormItem><FormLabel>Tags (comma-separated)</FormLabel><FormControl><Input {...field} placeholder="e.g. vegan, hydrating, summer" /></FormControl><FormMessage /></FormItem>
                 )} />
 
-                <FormField control={form.control} name="images" render={({ field: { onChange, value, ...rest } }) => (
+                <FormField control={form.control} name="images" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Product Photos</FormLabel>
+                        <FormLabel>Product Photos (comma-separated URLs)</FormLabel>
                         <FormControl>
-                            <Input type="file" multiple onChange={(e) => onChange(e.target.files)} {...rest} />
+                            <Input type="text" {...field} placeholder="https://.../img1.png, https://.../img2.png" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -152,7 +152,7 @@ export default function AddProductPage() {
             </div>
 
             <Button type="submit">Add Product</Button>
-             {state.message && <p className="text-sm text-destructive">{state.message}</p>}
+             {state?.message && <p className="text-sm text-destructive">{state.message}</p>}
           </form>
         </Form>
       </CardContent>

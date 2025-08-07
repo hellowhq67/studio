@@ -7,9 +7,18 @@ import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import type { Product } from '@/lib/types';
+import prisma from '@/lib/prisma';
+import type { Product } from '@prisma/client';
+
+async function getProducts(): Promise<Product[]> {
+  'use server';
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return products;
+}
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,12 +27,10 @@ export default function AdminProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+        const productsData = await getProducts();
         setProducts(productsData);
       } catch (error) {
         console.error("Error fetching products: ", error);
-        // Handle error (e.g., show a toast message)
       } finally {
         setLoading(false);
       }
@@ -78,7 +85,7 @@ export default function AdminProductsPage() {
                     alt={product.name}
                     className="aspect-square rounded-md object-cover"
                     height="64"
-                    src={product.images[0]}
+                    src={product.images[0] || 'https://placehold.co/64x64.png'}
                     width="64"
                   />
                 </TableCell>

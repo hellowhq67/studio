@@ -2,14 +2,10 @@
 'use server';
 
 import { z } from 'zod';
-import { db, storage } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+import { Category } from '@prisma/client';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -25,24 +21,9 @@ const ProductSchema = z.object({
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
   brand: z.string().min(1, 'Brand is required'),
-  images: z.any()
-    .refine((files) => files?.length >= 1, 'At least one image is required.')
-    .refine((files) => Array.from(files).every((file: any) => file.size <= MAX_FILE_SIZE), `Max file size is 5MB.`)
-    .refine(
-      (files) => Array.from(files).every((file: any) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
-      '.jpg, .jpeg, .png and .webp files are accepted.'
-    ),
+  // Images are now just URLs, not files
+  images: z.string().min(1, 'At least one image URL is required'), 
 });
-
-async function uploadImages(images: File[]): Promise<string[]> {
-  const uploadTasks = Array.from(images).map(async (file) => {
-    const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
-  });
-  return Promise.all(uploadTasks);
-}
 
 export async function addProduct(prevState: any, formData: FormData) {
   const validatedFields = ProductSchema.safeParse({
@@ -59,7 +40,7 @@ export async function addProduct(prevState: any, formData: FormData) {
     deliveryTime: formData.get('deliveryTime'),
     category: formData.get('category'),
     brand: formData.get('brand'),
-    images: formData.getAll('images'),
+    images: formData.get('images'),
   });
 
   if (!validatedFields.success) {
@@ -70,17 +51,16 @@ export async function addProduct(prevState: any, formData: FormData) {
   }
 
   try {
-    const imageUrls = await uploadImages(validatedFields.data.images as unknown as File[]);
+    const { images, tags, ...productData } = validatedFields.data;
     
-    const productData = {
-      ...validatedFields.data,
-      tags: validatedFields.data.tags.split(',').map(tag => tag.trim()),
-      images: imageUrls,
-      rating: 0, // Default rating
-      reviewCount: 0 // Default review count
-    };
-
-    await addDoc(collection(db, 'products'), productData);
+    await prisma.product.create({
+      data: {
+        ...productData,
+        tags: tags.split(',').map(tag => tag.trim()),
+        images: images.split(',').map(img => img.trim()), // Assuming comma-separated image URLs
+        category: validatedFields.data.category as Category,
+      }
+    });
 
   } catch (error) {
     console.error('Error adding product:', error);

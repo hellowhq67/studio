@@ -2,17 +2,52 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { 
-  User, 
+  User as FirebaseUser,
   onAuthStateChanged, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut,
   updateProfile
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
+import prisma from '@/lib/prisma';
 import { Loader2 } from 'lucide-react';
-import type { AppUser } from '@/lib/types';
+
+// This is a server action to get user role from your new DB
+async function getUserRole(firebaseUid: string): Promise<'ADMIN' | 'CUSTOMER'> {
+    'use server';
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseUid },
+            select: { role: true }
+        });
+        return user?.role || 'CUSTOMER';
+    } catch (error) {
+        console.error("Failed to fetch user role:", error);
+        return 'CUSTOMER';
+    }
+}
+
+// This is a server action to create a user in your new DB
+async function createUserInDb(data: { firebaseUid: string; email: string; name: string; }) {
+    'use server';
+    await prisma.user.create({
+        data: {
+            firebaseUid: data.firebaseUid,
+            email: data.email,
+            name: data.name,
+            role: 'CUSTOMER'
+        }
+    });
+}
+
+export interface AppUser {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+    role: 'ADMIN' | 'CUSTOMER';
+}
 
 interface AuthContextType {
   user: AppUser | null;
@@ -28,20 +63,21 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserRole = useCallback(async (firebaseUser: User): Promise<AppUser> => {
-    const userDocRef = doc(db, "users", firebaseUser.uid);
-    const userDoc = await getDoc(userDocRef);
-    if (userDoc.exists() && userDoc.data().role) {
-      return { ...firebaseUser, role: userDoc.data().role };
-    }
-    // Default to 'customer' if no role is found
-    return { ...firebaseUser, role: 'customer' };
+  const fetchUserWithRole = useCallback(async (firebaseUser: FirebaseUser): Promise<AppUser> => {
+    const role = await getUserRole(firebaseUser.uid);
+    return { 
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        role: role
+    };
   }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const appUser = await fetchUserRole(firebaseUser);
+        const appUser = await fetchUserWithRole(firebaseUser);
         setUser(appUser);
       } else {
         setUser(null);
@@ -49,7 +85,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     });
     return () => unsubscribe();
-  }, [fetchUserRole]);
+  }, [fetchUserWithRole]);
 
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
     setLoading(true);
@@ -57,21 +93,21 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName });
       
-      // Create user document in Firestore with 'customer' role
-      const userDocRef = doc(db, "users", userCredential.user.uid);
-      await setDoc(userDocRef, {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          displayName: displayName,
-          role: 'customer'
-      });
+      // Create user in your Postgres DB via Prisma
+      if (userCredential.user.email) {
+        await createUserInDb({
+            firebaseUid: userCredential.user.uid,
+            email: userCredential.user.email,
+            name: displayName
+        });
+      }
       
-      const appUser = await fetchUserRole(userCredential.user);
+      const appUser = await fetchUserWithRole(userCredential.user);
       setUser(appUser);
     } finally {
       setLoading(false);
     }
-  }, [fetchUserRole]);
+  }, [fetchUserWithRole]);
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
