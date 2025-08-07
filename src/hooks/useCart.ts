@@ -4,8 +4,6 @@ import React, { createContext, useContext, useState, useMemo, useCallback, useEf
 import type { CartItem, Product } from '@/lib/types';
 import { useToast } from './use-toast';
 import { useAuth } from './useAuth';
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
-import { app } from '@/lib/firebase';
 
 interface CartContextType {
   items: CartItem[];
@@ -20,8 +18,6 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const db = getFirestore(app);
-
 const getInitialCart = (): CartItem[] => {
   if (typeof window === 'undefined') {
     return [];
@@ -35,77 +31,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
-
-  const writeToFirestore = useCallback(async (cartItems: CartItem[]) => {
-    if (user) {
-      try {
-        const cartRef = doc(db, 'carts', user.uid);
-        await setDoc(cartRef, { items: cartItems });
-      } catch (error) {
-        console.error("Error writing cart to Firestore:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Error Saving Cart',
-          description: 'Could not save your cart to the cloud.',
-        });
-      }
-    }
-  }, [user, toast]);
   
   useEffect(() => {
-    const syncCart = async () => {
-      setLoading(true);
-      if (user) {
-        // User is logged in, sync with Firestore
-        const cartRef = doc(db, 'carts', user.uid);
-        const cartSnap = await getDoc(cartRef);
-        const guestCart = getInitialCart();
-
-        if (cartSnap.exists()) {
-          const firestoreCart = cartSnap.data().items as CartItem[];
-          // Merge guest cart with firestore cart
-          const mergedCart = [...firestoreCart];
-
-          guestCart.forEach(guestItem => {
-            const existingItemIndex = mergedCart.findIndex(item => item.product.id === guestItem.product.id);
-            if (existingItemIndex > -1) {
-              mergedCart[existingItemIndex].quantity += guestItem.quantity;
-            } else {
-              mergedCart.push(guestItem);
-            }
-          });
-          
-          setItems(mergedCart);
-          if (guestCart.length > 0) {
-            await writeToFirestore(mergedCart);
-          }
-        } else if (guestCart.length > 0) {
-          // No firestore cart, but guest cart exists, so upload it
-          setItems(guestCart);
-          await writeToFirestore(guestCart);
-        } else {
-          setItems([]);
-        }
-        localStorage.removeItem('glowup-cart-guest');
-      } else {
-        // User is not logged in, use localStorage
-        setItems(getInitialCart());
-      }
-      setLoading(false);
-    };
-
-    syncCart();
-  }, [user, writeToFirestore]);
+    // For this simplified example, we'll just load from localStorage
+    // A full implementation would merge localStorage cart with a DB-backed cart for logged-in users
+    setLoading(true);
+    setItems(getInitialCart());
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    // Save to localStorage for guest users
-    if (!user) {
-      localStorage.setItem('glowup-cart-guest', JSON.stringify(items));
-    }
-  }, [items, user]);
+    // Save to localStorage whenever cart changes, regardless of auth state
+    // This simplifies guest/user cart handling for now
+    localStorage.setItem('glowup-cart-guest', JSON.stringify(items));
+  }, [items]);
   
-  const addItem = useCallback(async (product: Product, quantity: number) => {
-    const newItemsFn = (prevItems: CartItem[]) => {
+  const addItem = useCallback((product: Product, quantity: number) => {
+    setItems(prevItems => {
       const existingItem = prevItems.find((item) => item.product.id === product.id);
       if (existingItem) {
         return prevItems.map((item) =>
@@ -113,47 +55,27 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         );
       }
       return [...prevItems, { product, quantity }];
-    };
-    
-    setItems(prev => {
-        const newItems = newItemsFn(prev);
-        if (user) {
-            writeToFirestore(newItems);
-        }
-        return newItems;
     });
-  }, [toast, user, writeToFirestore]);
+  }, []);
 
-  const removeItem = useCallback(async (productId: string) => {
-    const newItems = items.filter((item) => item.product.id !== productId);
-    setItems(newItems);
-    if (user) {
-      await writeToFirestore(newItems);
-    }
-  }, [user, items, writeToFirestore]);
+  const removeItem = useCallback((productId: string) => {
+    setItems(prevItems => prevItems.filter((item) => item.product.id !== productId));
+  }, []);
 
-  const updateQuantity = useCallback(async (productId: string, quantity: number) => {
-    let newItems;
-    if (quantity <= 0) {
-      newItems = items.filter((item) => item.product.id !== productId);
-    } else {
-      newItems = items.map((item) =>
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
+    setItems(prevItems => {
+      if (quantity <= 0) {
+        return prevItems.filter((item) => item.product.id !== productId);
+      }
+      return prevItems.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item
       );
-    }
-    setItems(newItems);
-    if (user) {
-        await writeToFirestore(newItems);
-    }
-  }, [user, items, writeToFirestore]);
+    });
+  }, []);
 
-  const clearCart = useCallback(async () => {
+  const clearCart = useCallback(() => {
     setItems([]);
-    if (user) {
-      const cartRef = doc(db, 'carts', user.uid);
-      await deleteDoc(cartRef);
-    }
-  }, [user]);
+  }, []);
 
   const cartTotal = useMemo(() => {
     return items.reduce((total, item) => {

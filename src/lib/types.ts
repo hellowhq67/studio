@@ -46,5 +46,5 @@ export interface AppUser {
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
-    role: 'admin' | 'customer';
+    role: 'ADMIN' | 'CUSTOMER';
 }

@@ -8,11 +8,10 @@ import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { createOrder } from '@/actions/order-actions';
 
 
 export default function CheckoutPage() {
@@ -26,10 +25,7 @@ export default function CheckoutPage() {
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-    toast({
-      title: 'Processing Order...',
-      description: 'Please wait while we finalize your order.',
-    });
+    
 
     if (!user) {
         toast({
@@ -51,20 +47,19 @@ export default function CheckoutPage() {
     }
 
     try {
-        await addDoc(collection(db, 'orders'), {
-            userId: user.uid,
-            items: items,
-            total: cartTotal,
-            date: new Date().toISOString(),
-            status: 'Processing',
-            shippingAddress: shippingAddress
+        toast({
+          title: 'Processing Order...',
+          description: 'Please wait while we finalize your order.',
         });
+        
+        const order = await createOrder(user.uid, items, cartTotal, shippingAddress);
 
-        // Simulate payment processing time
-        setTimeout(() => {
-          clearCart();
-          router.push('/checkout/success');
-        }, 1500);
+        if (order) {
+            clearCart();
+            router.push('/checkout/success');
+        } else {
+             throw new Error('Order creation failed.');
+        }
 
     } catch (error) {
         console.error('Order placement error:', error);

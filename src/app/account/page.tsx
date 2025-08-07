@@ -1,36 +1,43 @@
+
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Order } from '@/lib/types';
+import type { Order } from '@prisma/client';
 import { useCurrency } from '@/hooks/useCurrency';
+import { getUserOrders } from '@/actions/order-actions';
+
+interface OrderItem {
+  quantity: number;
+  product: {
+      name: string;
+      // other product fields
+  };
+}
+
+interface EnrichedOrder extends Omit<Order, 'items'> {
+    items: OrderItem[];
+    date: string; // Ensure date is a string
+}
+
 
 export default function AccountPage() {
   const { user } = useAuth();
   const { formatPrice } = useCurrency();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<EnrichedOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
       if (user) {
         try {
-          const ordersRef = collection(db, 'orders');
-          const q = query(ordersRef, where('userId', '==', user.uid));
-          const querySnapshot = await getDocs(q);
-          const userOrders = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...(doc.data() as Omit<Order, 'id'>),
-          }));
-          setOrders(userOrders);
+          const userOrders = await getUserOrders(user.uid);
+           setOrders(userOrders as EnrichedOrder[]);
         } catch (error) {
           console.error('Error fetching orders:', error);
         } finally {
