@@ -10,43 +10,17 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import prisma from '@/lib/prisma';
 import { Loader2 } from 'lucide-react';
+import { getUserRole, createUserInDb } from '@/actions/user-actions';
+import type { Role } from '@prisma/client';
 
-// This is a server action to get user role from your new DB
-async function getUserRole(firebaseUid: string): Promise<'ADMIN' | 'CUSTOMER'> {
-    'use server';
-    try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseUid },
-            select: { role: true }
-        });
-        return user?.role || 'CUSTOMER';
-    } catch (error) {
-        console.error("Failed to fetch user role:", error);
-        return 'CUSTOMER';
-    }
-}
-
-// This is a server action to create a user in your new DB
-async function createUserInDb(data: { firebaseUid: string; email: string; name: string; }) {
-    'use server';
-    await prisma.user.create({
-        data: {
-            firebaseUid: data.firebaseUid,
-            email: data.email,
-            name: data.name,
-            role: 'CUSTOMER'
-        }
-    });
-}
 
 export interface AppUser {
     uid: string;
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
-    role: 'ADMIN' | 'CUSTOMER';
+    role: Role;
 }
 
 interface AuthContextType {
