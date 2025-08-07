@@ -76,7 +76,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           });
           
           setItems(mergedCart);
-          await writeToFirestore(mergedCart);
+          if (guestCart.length > 0) {
+            await writeToFirestore(mergedCart);
+          }
         } else if (guestCart.length > 0) {
           // No firestore cart, but guest cart exists, so upload it
           setItems(guestCart);
@@ -113,12 +115,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       return [...prevItems, { product, quantity }];
     };
     
-    setItems(prev => newItemsFn(prev));
-
-    if (user) {
-        await writeToFirestore(newItemsFn(items));
-    }
-  }, [toast, user, writeToFirestore, items]);
+    setItems(prev => {
+        const newItems = newItemsFn(prev);
+        if (user) {
+            writeToFirestore(newItems);
+        }
+        return newItems;
+    });
+  }, [toast, user, writeToFirestore]);
 
   const removeItem = useCallback(async (productId: string) => {
     const newItems = items.filter((item) => item.product.id !== productId);

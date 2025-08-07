@@ -143,12 +143,14 @@ export default function Header() {
                           <span>Account</span>
                         </Link>
                       </DropdownMenuItem>
-                       <DropdownMenuItem asChild>
-                        <Link href="/admin">
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Admin</span>
-                        </Link>
-                      </DropdownMenuItem>
+                       {user.role === 'admin' && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin">
+                            <Shield className="mr-2 h-4 w-4" />
+                            <span>Admin</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={logout}>
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
