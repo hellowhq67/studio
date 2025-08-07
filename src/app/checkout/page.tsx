@@ -8,27 +8,76 @@ import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
+
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
   const { formatPrice } = useCurrency();
+  const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handlePayment = (e: React.FormEvent) => {
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate payment processing
+    setIsProcessing(true);
     toast({
-      title: 'Processing Payment...',
-      description: 'Please wait while we process your order.',
+      title: 'Processing Order...',
+      description: 'Please wait while we finalize your order.',
     });
-    setTimeout(() => {
-      clearCart();
-      router.push('/checkout/success');
-    }, 1500);
+
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Authentication Error',
+            description: 'You must be logged in to place an order.',
+        });
+        setIsProcessing(false);
+        return;
+    }
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const shippingAddress = {
+        name: formData.get('name') as string,
+        address: formData.get('address') as string,
+        city: formData.get('city') as string,
+        state: formData.get('state') as string,
+        zip: formData.get('zip') as string,
+    }
+
+    try {
+        await addDoc(collection(db, 'orders'), {
+            userId: user.uid,
+            items: items,
+            total: cartTotal,
+            date: new Date().toISOString(),
+            status: 'Processing',
+            shippingAddress: shippingAddress
+        });
+
+        // Simulate payment processing time
+        setTimeout(() => {
+          clearCart();
+          router.push('/checkout/success');
+        }, 1500);
+
+    } catch (error) {
+        console.error('Order placement error:', error);
+         toast({
+            variant: 'destructive',
+            title: 'Order Failed',
+            description: 'There was a problem placing your order. Please try again.',
+        });
+        setIsProcessing(false);
+    }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isProcessing) {
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
             <h1 className="font-headline text-4xl">Your Cart is Empty</h1>
@@ -55,24 +104,24 @@ export default function CheckoutPage() {
                   <legend className="font-semibold text-lg mb-2">Shipping Information</legend>
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="Jane Doe" required />
+                    <Input id="name" name="name" placeholder="Jane Doe" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="address">Address</Label>
-                    <Input id="address" placeholder="123 Glow St" required />
+                    <Input id="address" name="address" placeholder="123 Glow St" required />
                   </div>
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="city">City</Label>
-                            <Input id="city" placeholder="Beautyville" required />
+                            <Input id="city" name="city" placeholder="Beautyville" required />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="state">State</Label>
-                            <Input id="state" placeholder="CA" required />
+                            <Input id="state" name="state" placeholder="CA" required />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="zip">ZIP Code</Label>
-                            <Input id="zip" placeholder="90210" required />
+                            <Input id="zip" name="zip" placeholder="90210" required />
                         </div>
                     </div>
                 </fieldset>
@@ -125,8 +174,9 @@ export default function CheckoutPage() {
                     <span>Total</span>
                     <span>{formatPrice(cartTotal)}</span>
                 </div>
-                <Button type="submit" form="payment-form" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                    Pay Now
+                <Button type="submit" form="payment-form" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isProcessing}>
+                    {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {isProcessing ? 'Placing Order...' : 'Pay Now'}
                 </Button>
             </CardFooter>
           </Card>
