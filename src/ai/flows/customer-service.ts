@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 const prompt = ai.definePrompt({
   name: 'customerServicePrompt',
-  input: { schema: z.string() },
+  input: { schema: z.object({ input: z.string() }) },
   output: { schema: z.string() },
   prompt: `You are a friendly and helpful customer service agent for "GlowUp," an online beauty and cosmetics store. 
   
@@ -27,6 +27,6 @@ const prompt = ai.definePrompt({
 });
 
 export async function customerService(query: string): Promise<string> {
-  const { output } = await prompt(query);
+  const { output } = await prompt({ input: query });
   return output || "I'm sorry, I'm not sure how to answer that. Could you rephrase?";
 }
