@@ -7,7 +7,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -21,12 +22,16 @@ model User {
   updatedAt   DateTime @updatedAt
 }
 
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
 model Product {
-  id              String @id @default(cuid())
+  id              String       @id @default(cuid())
   name            String
   description     String
   longDescription String
-  tags            String[]
   price           Float
   salePrice       Float?
   specialPrice    Float?
@@ -37,19 +42,28 @@ model Product {
   category        Category
   brand           String
   images          String[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  OrderItem       OrderItem[]
+  tags            String[]
+  orderItems      OrderItem[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+enum Category {
+  Skincare
+  Makeup
+  Haircare
+  Fragrance
 }
 
 model Order {
-  id              String @id @default(cuid())
-  user            User @relation(fields: [userId], references: [id])
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id])
   userId          String
-  total           Float
-  status          String
-  shippingAddress Json
   items           OrderItem[]
+  total           Float
+  status          String // e.g., 'Processing', 'Paid', 'Shipped', 'Delivered', 'Cancelled'
+  transactionId   String?  @unique
+  shippingAddress Json
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -62,16 +76,5 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float // Price at the time of purchase
-}
-
-enum Role {
-  ADMIN
-  CUSTOMER
-}
-
-enum Category {
-  Skincare
-  Makeup
-  Haircare
-  Fragrance
+  createdAt DateTime @default(now())
 }

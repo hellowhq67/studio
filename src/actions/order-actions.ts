@@ -4,14 +4,22 @@ import prisma from '@/lib/prisma';
 import type { CartItem } from '@/lib/types';
 import type { Order } from '@prisma/client';
 
+type OrderItemInput = {
+    productId: string;
+    quantity: number;
+    price: number;
+}
+
 export async function createOrder(
-  userId: string,
-  items: CartItem[],
+  firebaseUid: string,
+  items: OrderItemInput[],
   total: number,
-  shippingAddress: any
+  shippingAddress: any,
+  transactionId?: string,
+  status: 'Processing' | 'Paid' | 'Failed' = 'Processing'
 ): Promise<Order | null> {
   try {
-    const user = await prisma.user.findFirst({ where: { firebaseUid: userId } });
+    const user = await prisma.user.findFirst({ where: { firebaseUid } });
     if (!user) {
         throw new Error('User not found');
     }
@@ -20,13 +28,14 @@ export async function createOrder(
       data: {
         userId: user.id,
         total,
-        status: 'Processing',
+        status: status,
+        transactionId: transactionId,
         shippingAddress,
         items: {
           create: items.map(item => ({
-            productId: item.product.id,
+            productId: item.productId,
             quantity: item.quantity,
-            price: item.product.salePrice ?? item.product.price,
+            price: item.price,
           })),
         },
       },

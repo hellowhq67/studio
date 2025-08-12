@@ -16,7 +16,7 @@ import { createOrder } from '@/actions/order-actions';
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency } = useCurrency();
   const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -37,6 +37,16 @@ export default function CheckoutPage() {
         return;
     }
 
+    if(currency !== 'BDT') {
+      toast({
+        variant: 'destructive',
+        title: 'Currency Not Supported',
+        description: 'SSLCommerz only supports BDT. Please switch your currency.',
+      });
+      setIsProcessing(false);
+      return;
+    }
+
     const formData = new FormData(e.target as HTMLFormElement);
     const shippingAddress = {
         name: formData.get('name') as string,
@@ -44,29 +54,57 @@ export default function CheckoutPage() {
         city: formData.get('city') as string,
         state: formData.get('state') as string,
         zip: formData.get('zip') as string,
+        country: 'Bangladesh', // SSLCommerz requires country
     }
 
+    const paymentData = {
+      total_amount: cartTotal,
+      currency: 'BDT',
+      cus_name: shippingAddress.name,
+      cus_email: user.email,
+      cus_add1: shippingAddress.address,
+      cus_city: shippingAddress.city,
+      cus_state: shippingAddress.state,
+      cus_postcode: shippingAddress.zip,
+      cus_country: shippingAddress.country,
+      cus_phone: '01711111111', // Placeholder, consider adding a phone field
+      shipping_method: 'Courier',
+      product_name: items.map(i => i.product.name).join(', '),
+      product_category: 'Beauty',
+      product_profile: 'general',
+      // Pass cart and shipping info to be retrieved in the success callback
+      value_a: JSON.stringify(items.map(item => ({productId: item.product.id, quantity: item.quantity, price: item.product.salePrice ?? item.product.price}))),
+      value_b: JSON.stringify(shippingAddress),
+      value_c: user.uid,
+    };
+
     try {
-        toast({
-          title: 'Processing Order...',
-          description: 'Please wait while we finalize your order.',
+       toast({
+          title: 'Redirecting to Payment...',
+          description: 'You will be redirected to SSLCommerz to complete your payment.',
         });
-        
-        const order = await createOrder(user.uid, items, cartTotal, shippingAddress);
 
-        if (order) {
-            clearCart();
-            router.push('/checkout/success');
-        } else {
-             throw new Error('Order creation failed.');
-        }
+      const response = await fetch('/api/checkout/sslcommerz/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData),
+      });
 
-    } catch (error) {
-        console.error('Order placement error:', error);
+      const data = await response.json();
+
+      if (data.GatewayPageURL) {
+        // Redirect to SSLCommerz payment page
+        window.location.href = data.GatewayPageURL;
+      } else {
+        throw new Error(data.message || 'Failed to initialize payment.');
+      }
+
+    } catch (error: any) {
+        console.error('Payment initialization error:', error);
          toast({
             variant: 'destructive',
-            title: 'Order Failed',
-            description: 'There was a problem placing your order. Please try again.',
+            title: 'Payment Failed',
+            description: error.message || 'There was a problem initiating the payment. Please try again.',
         });
         setIsProcessing(false);
     }
@@ -91,15 +129,14 @@ export default function CheckoutPage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline text-2xl">Shipping & Payment</CardTitle>
+              <CardTitle className="font-headline text-2xl">Shipping Information</CardTitle>
             </CardHeader>
             <CardContent>
               <form id="payment-form" onSubmit={handlePayment} className="space-y-6">
                 <fieldset className="space-y-4">
-                  <legend className="font-semibold text-lg mb-2">Shipping Information</legend>
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" name="name" placeholder="Jane Doe" required />
+                    <Input id="name" name="name" defaultValue={user?.displayName || ''} placeholder="Jane Doe" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="address">Address</Label>
@@ -111,32 +148,14 @@ export default function CheckoutPage() {
                             <Input id="city" name="city" placeholder="Beautyville" required />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="state">State</Label>
-                            <Input id="state" name="state" placeholder="CA" required />
+                            <Label htmlFor="state">State / Division</Label>
+                            <Input id="state" name="state" placeholder="Dhaka" required />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="zip">ZIP Code</Label>
-                            <Input id="zip" name="zip" placeholder="90210" required />
+                            <Input id="zip" name="zip" placeholder="1212" required />
                         </div>
                     </div>
-                </fieldset>
-                
-                <fieldset className="space-y-4">
-                  <legend className="font-semibold text-lg mb-2">Payment Details (Simulated)</legend>
-                  <div className="space-y-2">
-                    <Label htmlFor="card-number">Card Number</Label>
-                    <Input id="card-number" placeholder="**** **** **** 1234" required />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="expiry">Expiry</Label>
-                      <Input id="expiry" placeholder="MM/YY" required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cvc">CVC</Label>
-                      <Input id="cvc" placeholder="123" required />
-                    </div>
-                  </div>
                 </fieldset>
               </form>
             </CardContent>
@@ -171,7 +190,7 @@ export default function CheckoutPage() {
                 </div>
                 <Button type="submit" form="payment-form" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isProcessing}>
                     {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {isProcessing ? 'Placing Order...' : 'Pay Now'}
+                    {isProcessing ? 'Processing...' : `Pay with SSLCommerz`}
                 </Button>
             </CardFooter>
           </Card>
