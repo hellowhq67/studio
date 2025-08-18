@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -33,10 +34,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const salePercentage = hasSale ? Math.round(((product.price - product.salePrice!) / product.price) * 100) : 0;
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border bg-white dark:bg-card text-card-foreground group">
+    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border bg-card text-card-foreground group">
       <Link href={`/products/${product.id}`} className="contents">
         <CardHeader className="p-0 relative">
-          <div className="aspect-[4/3] w-full overflow-hidden bg-secondary">
+          <div className="aspect-[4/3] w-full overflow-hidden">
             <img
               src={product.images[0]}
               alt={product.name}
@@ -47,17 +48,17 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           </div>
           {hasSale && (
-            <Badge className="absolute top-3 left-3">-{salePercentage}%</Badge>
+            <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground">-{salePercentage}%</Badge>
           )}
            <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white">
+                <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm">
                     <Heart size={16} />
                 </Button>
                  <Button 
                     onClick={handleAddToCart}
                     size="icon" 
                     variant="outline"
-                    className="h-8 w-8 rounded-full bg-white"
+                    className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm"
                     aria-label="Add to cart"
                     >
                         <ShoppingCart size={16}/>
@@ -68,7 +69,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm text-muted-foreground">{product.category}</p>
           <CardTitle className="font-semibold text-base mt-1 mb-2 leading-tight flex-grow">{product.name}</CardTitle>
           <div className="flex items-center justify-between mt-auto">
-             <p className="font-bold text-lg text-primary">{formatPrice(displayPrice ?? 0)}</p>
+             <div className="flex items-baseline gap-2">
+                <p className="font-bold text-lg text-primary">{formatPrice(displayPrice ?? 0)}</p>
+                {hasSale && <p className="text-sm text-muted-foreground line-through">{formatPrice(product.price)}</p>}
+             </div>
              <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                     <Star key={i} size={16} className={i < Math.floor(product.rating) ? 'fill-current' : 'stroke-current'} />
