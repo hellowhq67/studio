@@ -5,7 +5,7 @@ import type { Product } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
-import { Star, ShoppingBag } from 'lucide-react';
+import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -33,37 +33,47 @@ export default function ProductCard({ product }: ProductCardProps) {
   const salePercentage = hasSale ? Math.round(((product.price - product.salePrice!) / product.price) * 100) : 0;
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl border-transparent bg-card text-card-foreground group">
+    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border bg-white dark:bg-card text-card-foreground group">
       <Link href={`/products/${product.id}`} className="contents">
         <CardHeader className="p-0 relative">
-          <div className="aspect-square w-full overflow-hidden">
+          <div className="aspect-[4/3] w-full overflow-hidden bg-secondary">
             <img
               src={product.images[0]}
               alt={product.name}
               width={600}
-              height={600}
+              height={450}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint={`${product.category} product`}
             />
           </div>
           {hasSale && (
-            <Badge variant="destructive" className="absolute top-2 left-2">-{salePercentage}%</Badge>
+            <Badge className="absolute top-3 left-3">-{salePercentage}%</Badge>
           )}
-           <Button 
-            onClick={handleAddToCart}
-            size="icon" 
-            className="absolute bottom-2 right-2 h-10 w-10 rounded-full bg-primary/80 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm hover:bg-primary"
-            aria-label="Add to cart"
-            >
-                <ShoppingBag size={20}/>
-           </Button>
+           <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white">
+                    <Heart size={16} />
+                </Button>
+                 <Button 
+                    onClick={handleAddToCart}
+                    size="icon" 
+                    variant="outline"
+                    className="h-8 w-8 rounded-full bg-white"
+                    aria-label="Add to cart"
+                    >
+                        <ShoppingCart size={16}/>
+                </Button>
+           </div>
         </CardHeader>
-        <CardContent className="p-4 text-center flex-grow">
-          <p className="text-xs text-muted-foreground uppercase">{product.brand}</p>
-          <CardTitle className="font-semibold text-base mt-1 mb-2 leading-tight">{product.name}</CardTitle>
-          <div className="flex justify-center items-baseline gap-2">
-            <p className={`font-bold text-lg ${hasSale ? 'text-destructive' : ''}`}>{formatPrice(displayPrice ?? 0)}</p>
-            {hasSale && <p className="text-sm text-muted-foreground line-through">{formatPrice(product.price)}</p>}
+        <CardContent className="p-4 flex-grow flex flex-col">
+          <p className="text-sm text-muted-foreground">{product.category}</p>
+          <CardTitle className="font-semibold text-base mt-1 mb-2 leading-tight flex-grow">{product.name}</CardTitle>
+          <div className="flex items-center justify-between mt-auto">
+             <p className="font-bold text-lg text-primary">{formatPrice(displayPrice ?? 0)}</p>
+             <div className="flex text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={16} className={i < Math.floor(product.rating) ? 'fill-current' : 'stroke-current'} />
+                ))}
+            </div>
           </div>
         </CardContent>
       </Link>

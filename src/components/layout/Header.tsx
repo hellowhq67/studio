@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, User, Menu, LogOut, Shield } from 'lucide-react';
+import { ShoppingBag, User, Menu, Search, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
@@ -22,13 +22,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const navLinks = [
   { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
   { href: '/products', label: 'Shop' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 const Logo = () => (
-    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 10C27.9086 10 10 27.9086 10 50C10 72.0914 27.9086 90 50 90V82C32.3269 82 18 67.6731 18 50C18 32.3269 32.3269 18 50 18C67.6731 18 82 32.3269 82 50C82 59.2367 77.876 67.5213 71.2132 73.1237L65.5563 67.4668C70.7397 63.0476 74 56.8624 74 50C74 36.7452 63.2548 26 50 26C36.7452 26 26 36.7452 26 50C26 63.2548 36.7452 74 50 74V66C41.1634 66 34 58.8366 34 50C34 41.1634 41.1634 34 50 34C58.8366 34 66 41.1634 66 50H90C90 27.9086 72.0914 10 50 10Z" fill="hsl(var(--primary))"/>
-    </svg>
+    <Link href="/" className="flex items-center gap-2">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 0L20.6667 4.66667L26.6667 2.66667L28.5 8.33333L32 10.6667L29.3333 16L32 21.3333L28.5 23.6667L26.6667 29.3333L20.6667 27.3333L16 32L11.3333 27.3333L5.33333 29.3333L3.5 23.6667L0 21.3333L2.66667 16L0 10.6667L3.5 8.33333L5.33333 2.66667L11.3333 4.66667L16 0Z" fill="hsl(var(--primary))"/>
+        <path d="M21.3333 16C21.3333 18.9453 18.9453 21.3333 16 21.3333C13.0547 21.3333 10.6667 18.9453 10.6667 16C10.6667 13.0547 13.0547 10.6667 16 10.6667C18.9453 10.6667 21.3333 13.0547 21.3333 16Z" fill="white"/>
+      </svg>
+      <span className="font-bold text-2xl text-foreground">Ecomarts</span>
+    </Link>
 )
 
 const CurrencySwitcher = () => {
@@ -40,8 +47,8 @@ const CurrencySwitcher = () => {
                 <SelectValue placeholder="Currency" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="USD">USD ($)</SelectItem>
-                <SelectItem value="BDT">BDT (৳)</SelectItem>
+                <SelectItem value="USD">USD</SelectItem>
+                <SelectItem value="BDT">BDT</SelectItem>
             </SelectContent>
         </Select>
     )
@@ -57,14 +64,39 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-20 items-center">
+        <div className="md:hidden">
+            <Sheet>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+                <Logo />
+                <nav className="flex flex-col space-y-4 mt-8">
+                    {navLinks.map((link) => (
+                    <Link
+                        key={link.href}
+                        href={link.href}
+                        className="transition-colors hover:text-primary text-lg"
+                    >
+                        {link.label}
+                    </Link>
+                    ))}
+                </nav>
+            </SheetContent>
+            </Sheet>
+        </div>
+        
+        <div className="hidden md:flex">
             <Logo />
-            <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
-          </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+        </div>
+
+        <div className="hidden md:flex flex-1 justify-center">
+          <nav className="flex items-center space-x-8 text-base font-medium">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -74,48 +106,48 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-             {user && <Link href="/account" className="transition-colors hover:text-primary">Account</Link>}
           </nav>
         </div>
 
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="md:hidden">
-             <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
-                    <span className="sr-only">Toggle Menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                    <Link href="/" className="mr-6 flex items-center space-x-2 mb-4">
-                        <Logo />
-                        <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
-                    </Link>
-                    <nav className="flex flex-col space-y-4">
-                        {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="transition-colors hover:text-primary text-lg"
-                        >
-                            {link.label}
-                        </Link>
-                        ))}
-                         {user && <Link href="/account" className="transition-colors hover:text-primary text-lg">Account</Link>}
-                    </nav>
-                </SheetContent>
+
+        <div className="flex items-center gap-2 ml-auto">
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex">
+              <Search className="h-5 w-5" />
+            </Button>
+             <div className="hidden md:flex items-center">
+                <CurrencySwitcher />
+                <Select defaultValue="en">
+                    <SelectTrigger className="w-auto h-9 text-sm bg-transparent border-0 shadow-none focus:ring-0">
+                        <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="es">Spanish</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            
+            <Button variant="ghost" size="icon">
+              <Heart className="h-5 w-5" />
+            </Button>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingBag className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {itemCount}
+                    </span>
+                  )}
+                  <span className="sr-only">Shopping Cart</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <CartSheetContent />
+              </SheetContent>
             </Sheet>
-          </div>
-          
-           <Link href="/" className="flex items-center space-x-2 md:hidden">
-            <Logo />
-            <span className="font-bold font-headline text-2xl text-primary">GlowUp</span>
-          </Link>
 
-
-          <nav className="flex items-center">
-            <CurrencySwitcher />
             {!loading && (
               user ? (
                  <DropdownMenu>
@@ -128,60 +160,26 @@ export default function Header() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
-                          <p className="text-xs leading-none text-muted-foreground">
-                            {user.email}
-                          </p>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link href="/account">
                           <User className="mr-2 h-4 w-4" />
                           <span>Account</span>
                         </Link>
                       </DropdownMenuItem>
-                       {user.role === 'admin' && (
-                        <DropdownMenuItem asChild>
-                          <Link href="/admin">
-                            <Shield className="mr-2 h-4 w-4" />
-                            <span>Admin</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
                       <DropdownMenuItem onClick={logout}>
-                        <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
               ) : (
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Log In
-                  </Button>
-                </Link>
+                 <Button asChild>
+                    <Link href="/login">
+                        <User className="mr-2 h-4 w-4" />
+                        Login
+                    </Link>
+                 </Button>
               )
             )}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingBag className="h-5 w-5 text-accent" />
-                  {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                      {itemCount}
-                    </span>
-                  )}
-                  <span className="sr-only">Shopping Cart</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <CartSheetContent />
-              </SheetContent>
-            </Sheet>
-          </nav>
         </div>
       </div>
     </header>
