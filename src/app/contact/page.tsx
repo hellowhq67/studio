@@ -1,7 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import LiveChat from '@/components/contact/LiveChat';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+
 
 export default function ContactPage() {
   return (
@@ -11,7 +15,7 @@ export default function ContactPage() {
         <p className="text-lg text-muted-foreground mt-4">We're here to help! Reach out to us anytime.</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12 items-start">
         <div className="space-y-8">
           <Card>
             <CardHeader>
@@ -66,11 +70,31 @@ export default function ContactPage() {
         <div>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Live Chat</CardTitle>
-              <CardDescription>Get instant answers from our AI-powered support agent.</CardDescription>
+              <CardTitle>Send us a Message</CardTitle>
+              <CardDescription>Have a question or feedback? Drop us a line.</CardDescription>
             </CardHeader>
             <CardContent>
-              <LiveChat />
+              <form className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input id="firstName" placeholder="Jane" />
+                    </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input id="lastName" placeholder="Doe" />
+                    </div>
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="jane.doe@example.com" />
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="message">Message</Label>
+                    <Textarea id="message" placeholder="Your message..." />
+                </div>
+                <Button type="submit" className="w-full">Send Message</Button>
+              </form>
             </CardContent>
           </Card>
         </div>
