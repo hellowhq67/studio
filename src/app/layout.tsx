@@ -5,13 +5,12 @@ import { CartProvider } from '@/hooks/useCart';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { AuthProvider } from '@/hooks/useAuth';
-import { Poppins } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { CurrencyProvider } from '@/hooks/useCurrency';
 
-const poppins = Poppins({ 
-  subsets: ['latin'], 
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins' 
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-sans' 
 });
 
 export const metadata: Metadata = {
@@ -31,7 +30,7 @@ export default function RootLayout({
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
       </head>
-      <body className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen`}>
+      <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
           <CurrencyProvider>
             <CartProvider>
