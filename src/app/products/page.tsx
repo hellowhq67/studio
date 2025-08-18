@@ -1,31 +1,43 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { products as allProducts } from '@/lib/products';
+import { useState, useMemo, useEffect } from 'react';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
 import type { Product } from '@/lib/types';
+import { getProducts } from '@/actions/product-actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductsPage() {
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState({
     category: 'all',
     brand: 'all',
-    priceRange: [0, 100],
+    priceRange: [0, 500],
     rating: 0,
   });
   const [sortKey, setSortKey] = useState('newest');
 
-  const categories = useMemo(() => ['all', ...Array.from(new Set(allProducts.map(p => p.category)))], []);
-  const brands = useMemo(() => ['all', ...Array.from(new Set(allProducts.map(p => p.brand)))], []);
-  const maxPrice = useMemo(() => Math.max(...allProducts.map(p => p.price)), []);
-  
-  // Update initial price range filter to cover all products
-  useState(() => {
-    setFilters(f => ({...f, priceRange: [0, Math.ceil(maxPrice)]}));
-    return null;
-  });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const products = await getProducts();
+      setAllProducts(products);
+      if (products.length > 0) {
+        const maxPrice = Math.max(...products.map(p => p.price));
+        setFilters(f => ({ ...f, priceRange: [0, Math.ceil(maxPrice)] }));
+      }
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
 
+  const categories = useMemo(() => ['all', ...Array.from(new Set(allProducts.map(p => p.category)))], [allProducts]);
+  const brands = useMemo(() => ['all', ...Array.from(new Set(allProducts.map(p => p.brand)))], [allProducts]);
+  const maxPrice = useMemo(() => allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 500, [allProducts]);
+  
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
@@ -51,7 +63,7 @@ export default function ProductsPage() {
     
     return filtered;
 
-  }, [filters]);
+  }, [filters, allProducts]);
   
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts];
@@ -67,8 +79,7 @@ export default function ProductsPage() {
             break;
         case 'newest':
         default:
-            // Assuming products are already somewhat sorted by newest if they have IDs or dates
-            // For this static list, we'll just keep the original order.
+            // Assuming products are already sorted by createdAt from the server
             break;
     }
     return sorted;
@@ -90,10 +101,23 @@ export default function ProductsPage() {
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     onSortChange={handleSortChange}
+                    disabled={loading}
                 />
             </aside>
             <main className="md:col-span-3">
+              {loading ? (
+                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="space-y-2">
+                        <Skeleton className="h-64 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                      </div>
+                    ))}
+                  </div>
+              ) : (
                 <ProductGrid products={sortedProducts} />
+              )}
             </main>
         </div>
     </div>

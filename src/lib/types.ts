@@ -4,17 +4,17 @@ export interface Product {
   description: string;
   longDescription: string;
   price: number;
-  salePrice?: number;
+  salePrice?: number | null;
   rating: number;
   reviewCount: number;
   category: 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
   images: string[]; // URLs
   tags: string[];
   // New fields from user request
-  specialPrice?: number;
-  couponCode?: string;
-  deliveryCharge: number;
-  quantity: number;
+  specialPrice?: number | null;
+  couponCode?: string | null;
+  deliveryCharge?: number | null;
+  quantity?: number | null;
   deliveryTime: string;
   brand: string;
 }

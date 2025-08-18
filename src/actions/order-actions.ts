@@ -90,3 +90,25 @@ export async function getUserOrders(firebaseUid: string): Promise<any[]> {
         return [];
     }
 }
+
+export async function getAllOrders() {
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        user: true, // Include user data to get customer name/email
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return orders;
+  } catch (error) {
+    console.error("Failed to fetch all orders:", error);
+    return [];
+  }
+}

@@ -1,11 +1,10 @@
-// @/actions/product-actions.ts
 'use server';
 
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { Category } from '@prisma/client';
+import { Category, Product } from '@prisma/client';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -16,12 +15,11 @@ const ProductSchema = z.object({
   salePrice: z.coerce.number().optional(),
   specialPrice: z.coerce.number().optional(),
   couponCode: z.string().optional(),
-  deliveryCharge: z.coerce.number().min(0, 'Delivery charge cannot be negative'),
-  quantity: z.coerce.number().int().min(0, 'Quantity cannot be negative'),
+  deliveryCharge: z.coerce.number().min(0, 'Delivery charge cannot be negative').optional(),
+  quantity: z.coerce.number().int().min(0, 'Quantity cannot be negative').optional(),
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
   brand: z.string().min(1, 'Brand is required'),
-  // Images are now just URLs, not files
   images: z.string().min(1, 'At least one image URL is required'), 
 });
 
@@ -57,8 +55,10 @@ export async function addProduct(prevState: any, formData: FormData) {
       data: {
         ...productData,
         tags: tags.split(',').map(tag => tag.trim()),
-        images: images.split(',').map(img => img.trim()), // Assuming comma-separated image URLs
+        images: images.split(',').map(img => img.trim()),
         category: validatedFields.data.category as Category,
+        rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3, // mock rating
+        reviewCount: Math.floor(Math.random() * 200), // mock review count
       }
     });
 
@@ -68,5 +68,22 @@ export async function addProduct(prevState: any, formData: FormData) {
   }
   
   revalidatePath('/admin/products');
+  revalidatePath('/products');
   redirect('/admin/products');
+}
+
+export async function getProducts(): Promise<Product[]> {
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return products;
+}
+
+export async function getProductById(id: string): Promise<Product | null> {
+    const product = await prisma.product.findUnique({
+        where: { id }
+    });
+    return product;
 }

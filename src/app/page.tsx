@@ -1,4 +1,4 @@
-import { products } from '@/lib/products';
+import { getProducts } from '@/actions/product-actions';
 import ProductGrid from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -16,8 +16,9 @@ const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, 
     </div>
 )
 
-export default function Home() {
-  const beautyCareProducts = products.slice(0, 8);
+export default async function Home() {
+  const allProducts = await getProducts();
+  const beautyCareProducts = allProducts.slice(0, 8);
 
   return (
     <div className="bg-background">

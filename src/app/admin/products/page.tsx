@@ -7,18 +7,9 @@ import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import prisma from '@/lib/prisma';
-import type { Product } from '@prisma/client';
+import { getProducts } from '@/actions/product-actions';
+import type { Product } from '@/lib/types';
 
-async function getProducts(): Promise<Product[]> {
-  'use server';
-  const products = await prisma.product.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-  return products;
-}
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -91,7 +82,7 @@ export default function AdminProductsPage() {
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{product.quantity > 0 ? 'In Stock' : 'Out of Stock'}</Badge>
+                  <Badge variant="outline">{product.quantity && product.quantity > 0 ? 'In Stock' : 'Out of Stock'}</Badge>
                 </TableCell>
                 <TableCell>${(product.salePrice ?? product.price).toFixed(2)}</TableCell>
                 <TableCell className="hidden md:table-cell">{product.brand}</TableCell>
