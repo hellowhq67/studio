@@ -7,7 +7,7 @@ export default function TermsOfServicePage() {
         <CardHeader>
           <CardTitle className="font-headline text-4xl">Terms of Service</CardTitle>
         </CardHeader>
-        <CardContent className="prose max-w-none text-muted-foreground">
+        <CardContent className="prose dark:prose-invert max-w-none text-muted-foreground">
           <p>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
           <h2>1. Agreement to Terms</h2>
@@ -20,10 +20,10 @@ export default function TermsOfServicePage() {
           <p>When you create an account with us, you must provide us with information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our service.</p>
 
           <h2>4. Intellectual Property</h2>
-          <p>The Service and its original content, features, and functionality are and will remain the exclusive property of GlowUp and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of GlowUp.</p>
+          <p>The Service and its original content, features, and functionality are and will remain the exclusive property of EVANIEGLOW and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of EVANIEGLOW.</p>
 
           <h2>5. Limitation of Liability</h2>
-          <p>In no event shall GlowUp, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+          <p>In no event shall EVANIEGLOW, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
 
           <h2>6. Governing Law</h2>
           <p>These Terms shall be governed and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions.</p>
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
           <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. We will provide notice of any changes by posting the new Terms of Service on this page.</p>
 
           <h2>8. Contact Us</h2>
-          <p>If you have any questions about these Terms, please contact us at support@glowup.com.</p>
+          <p>If you have any questions about these Terms, please contact us at support@evanieglow.com.</p>
         </CardContent>
       </Card>
     </div>

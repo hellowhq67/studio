@@ -53,7 +53,7 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormValues) => {
     try {
       await signup(data.email, data.password, data.name);
-      toast({ title: "Account Created", description: "Welcome to GlowUp! You have been logged in." });
+      toast({ title: "Account Created", description: "Welcome to EVANIEGLOW! You have been logged in." });
       router.push('/account');
     } catch (error: any) {
       toast({
@@ -69,7 +69,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md bg-transparent border-0 shadow-none">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-4xl mb-2 text-primary">Create an Account</CardTitle>
-          <CardDescription>Join GlowUp to start your beauty journey.</CardDescription>
+          <CardDescription>Join EVANIEGLOW to start your beauty journey.</CardDescription>
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -129,7 +129,7 @@ export default function SignupPage() {
                 <GoogleIcon className="mr-2 h-5 w-5"/>
                 Sign up with Google
               </Button>
-              <Button variant="outline" className="w-full h-12 border-black bg-black text-white hover:bg-gray-800">
+               <Button variant="outline" className="w-full h-12 border-black bg-black text-white hover:bg-gray-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-gray-200">
                 <AppleIcon className="mr-2 h-5 w-5"/>
                 Sign up with Apple
               </Button>

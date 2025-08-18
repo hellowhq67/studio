@@ -7,11 +7,11 @@ export default function PrivacyPolicyPage() {
         <CardHeader>
           <CardTitle className="font-headline text-4xl">Privacy Policy</CardTitle>
         </CardHeader>
-        <CardContent className="prose max-w-none text-muted-foreground">
+        <CardContent className="prose dark:prose-invert max-w-none text-muted-foreground">
           <p>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
           <h2>1. Introduction</h2>
-          <p>Welcome to GlowUp. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+          <p>Welcome to EVANIEGLOW. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
 
           <h2>2. Information We Collect</h2>
           <p>We may collect personal information from you such as your name, shipping address, email address, and payment information when you place an order. We also collect information automatically as you navigate the site, such as your IP address and browsing history.</p>
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
           <p>Depending on your location, you may have rights regarding your personal information, including the right to access, correct, or delete your data. Please contact us to exercise these rights.</p>
           
           <h2>7. Contact Us</h2>
-          <p>If you have questions or comments about this Privacy Policy, please contact us at support@glowup.com.</p>
+          <p>If you have questions or comments about this Privacy Policy, please contact us at support@evanieglow.com.</p>
         </CardContent>
       </Card>
     </div>

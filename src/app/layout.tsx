@@ -15,8 +15,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'Ecomarts',
-  description: 'An e-commerce beauty app',
+  title: 'EVQ EVANIEGLOW',
+  description: 'Discover your radiance with EVQ EVANIEGLOW cosmetics.',
   icons: {
     icon: '/favicon.ico',
   },
@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
       </head>
       <body className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen`}>

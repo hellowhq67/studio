@@ -5,11 +5,8 @@ import { Input } from '../ui/input';
 
 const Logo = () => (
     <Link href="/" className="flex items-center gap-2">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 0L20.6667 4.66667L26.6667 2.66667L28.5 8.33333L32 10.6667L29.3333 16L32 21.3333L28.5 23.6667L26.6667 29.3333L20.6667 27.3333L16 32L11.3333 27.3333L5.33333 29.3333L3.5 23.6667L0 21.3333L2.66667 16L0 10.6667L3.5 8.33333L5.33333 2.66667L11.3333 4.66667L16 0Z" fill="hsl(var(--primary))"/>
-        <path d="M21.3333 16C21.3333 18.9453 18.9453 21.3333 16 21.3333C13.0547 21.3333 10.6667 18.9453 10.6667 16C10.6667 13.0547 13.0547 10.6667 16 10.6667C18.9453 10.6667 21.3333 13.0547 21.3333 16Z" fill="white"/>
-      </svg>
-      <span className="font-bold text-2xl text-white">Ecomarts</span>
+       <span className="text-3xl font-extrabold tracking-tight text-primary">EVQ</span>
+       <span className="font-semibold text-xl text-white">EVANIEGLOW</span>
     </Link>
 )
 
@@ -21,7 +18,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <Logo />
             <p className="text-sm text-gray-400 mt-4 max-w-sm">
-                Discover our new cosmetics, we believe in the power of nature to reveal your natural beauty.
+                Discover your radiance with EVANIEGLOW. We believe in the power of nature to reveal your natural beauty.
             </p>
             <div className="flex space-x-4 mt-4">
                 <Link href="#" className="text-gray-400 hover:text-primary">f</Link>
@@ -57,7 +54,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 border-t border-secondary/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
           <p className="text-center md:text-left text-gray-500">
-            &copy; {new Date().getFullYear()} Ecomarts. All Rights Reserved.
+            &copy; {new Date().getFullYear()} EVANIEGLOW. All Rights Reserved.
           </p>
            <div className="flex items-center gap-4 mt-4 md:mt-0">
              <img src="https://placehold.co/50x30/ffffff/000000?text=Visa" alt="Visa" />

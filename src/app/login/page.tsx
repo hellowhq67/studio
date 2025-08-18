@@ -70,7 +70,7 @@ export default function LoginPage() {
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
       <Card className="w-full max-w-md bg-transparent border-0 shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-4xl mb-2 text-primary">GlowUp</CardTitle>
+          <CardTitle className="font-headline text-4xl mb-2 text-primary">EVANIEGLOW</CardTitle>
           <CardDescription className="text-muted-foreground">Welcome back! Please enter your details.</CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -139,7 +139,7 @@ export default function LoginPage() {
                 <GoogleIcon className="mr-2 h-5 w-5"/>
                 Sign in with Google
               </Button>
-              <Button variant="outline" className="w-full h-12 border-black bg-black text-white hover:bg-gray-800">
+              <Button variant="outline" className="w-full h-12 border-black bg-black text-white hover:bg-gray-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-gray-200">
                 <AppleIcon className="mr-2 h-5 w-5"/>
                 Sign in with Apple
               </Button>

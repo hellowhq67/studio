@@ -20,16 +20,16 @@ export default function Home() {
   const beautyCareProducts = products.slice(0, 8);
 
   return (
-    <div className="bg-[#F8F8F8] dark:bg-background">
+    <div className="bg-background">
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="md:col-start-1">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight mb-4">
-              Ecomarts Beauty Cosmetics
+              EVQ EVANIEGLOW Cosmetics
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Discover our new cosmetics, we believe in the power of nature to reveal your natural beauty.
+              Discover our new cosmetics. We believe in the power of nature to reveal your natural beauty and glow.
             </p>
             <Button size="lg" asChild>
               <Link href="/products">Explore Collection <ArrowRight className="ml-2 h-5 w-5" /></Link>
@@ -42,7 +42,7 @@ export default function Home() {
             <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
                  <img src="https://placehold.co/400x600.png" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
             </div>
-             <div className="absolute top-1/2 -right-16 bg-white dark:bg-card p-4 rounded-lg shadow-lg w-48">
+             <div className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
                 <p className="font-bold">Luxurious Beauty Product</p>
                  <div className="w-full h-24 my-2 rounded-md overflow-hidden">
                     <img src="https://placehold.co/200x200.png" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
@@ -66,7 +66,7 @@ export default function Home() {
       </section>
       
       {/* Popular Categories */}
-      <section className="py-16 bg-white dark:bg-card">
+      <section className="py-16 bg-card">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
@@ -100,7 +100,7 @@ export default function Home() {
        {/* Featured Banners */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-card p-8 rounded-lg flex items-center">
+          <div className="bg-card p-8 rounded-lg flex items-center">
             <div className="flex-1">
               <h3 className="text-3xl font-bold mb-2">Flawless Finish Powder!</h3>
               <p className="text-muted-foreground mb-4">New product with 10% off</p>
@@ -111,14 +111,14 @@ export default function Home() {
             </div>
           </div>
           <div className="grid gap-8">
-              <div className="bg-white dark:bg-card p-6 rounded-lg flex items-center justify-between">
+              <div className="bg-card p-6 rounded-lg flex items-center justify-between">
                 <div>
                   <h4 className="text-2xl font-bold">Stripes Are Back!</h4>
                   <p className="text-muted-foreground">Why Stripes is the best!</p>
                 </div>
                 <img src="https://placehold.co/150x150.png" alt="Stripes" className="w-28 h-28 object-contain" data-ai-hint="beauty cream jar" />
               </div>
-              <div className="bg-white dark:bg-card p-6 rounded-lg flex items-center justify-between">
+              <div className="bg-card p-6 rounded-lg flex items-center justify-between">
                  <div>
                   <h4 className="text-2xl font-bold">Body Lotion</h4>
                   <p className="text-muted-foreground">Check Now</p>
@@ -144,7 +144,7 @@ export default function Home() {
       </section>
       
       {/* Testimonials */}
-       <section className="py-16 bg-white dark:bg-card">
+       <section className="py-16 bg-card">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
@@ -177,7 +177,7 @@ export default function Home() {
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="bg-white dark:bg-card rounded-lg overflow-hidden shadow-sm">
+                        <div key={i} className="bg-card rounded-lg overflow-hidden shadow-sm">
                             <img src={`https://placehold.co/400x300.png`} alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
                             <div className="p-6">
                                 <p className="text-sm text-muted-foreground mb-2">Dec 22, 2022 - By Admin</p>

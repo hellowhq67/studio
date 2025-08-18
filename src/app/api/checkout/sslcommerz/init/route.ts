@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const tran_id = `glowup_${randomBytes(8).toString('hex')}`;
+        const tran_id = `evg_${randomBytes(8).toString('hex')}`;
         
         const successUrl = `${req.nextUrl.origin}/api/checkout/sslcommerz/success`;
         const failUrl = `${req.nextUrl.origin}/api/checkout/sslcommerz/fail`;
