@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && patch-package"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
