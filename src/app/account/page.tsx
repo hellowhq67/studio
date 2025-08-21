@@ -8,21 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
-import type { Order } from '@prisma/client';
+import type { Order } from '@/lib/types';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getUserOrders } from '@/actions/order-actions';
+import type { Product } from '@/lib/types';
 
-interface OrderItem {
+interface EnrichedOrderItem {
   quantity: number;
-  product: {
-      name: string;
-      // other product fields
-  };
+  product: Product;
 }
 
 interface EnrichedOrder extends Omit<Order, 'items'> {
-    items: OrderItem[];
-    date: string; // Ensure date is a string
+    items: EnrichedOrderItem[];
+    date: string;
 }
 
 

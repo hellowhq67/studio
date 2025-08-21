@@ -1,3 +1,6 @@
+export type Category = 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
+export type Role = 'ADMIN' | 'CUSTOMER';
+
 export interface Product {
   id: string;
   name: string;
@@ -7,16 +10,17 @@ export interface Product {
   salePrice?: number | null;
   rating: number;
   reviewCount: number;
-  category: 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
-  images: string[]; // URLs
+  category: Category;
+  images: string[];
   tags: string[];
-  // New fields from user request
   specialPrice?: number | null;
   couponCode?: string | null;
   deliveryCharge?: number | null;
   quantity?: number | null;
   deliveryTime: string;
   brand: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CartItem {
@@ -24,21 +28,31 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+  price: number;
+}
 
 export interface Order {
   id: string;
   userId: string;
-  items: CartItem[];
+  items: OrderItem[];
   total: number;
-  date: string; // Or Date
-  status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  status: 'Processing' | 'Paid' | 'Failed' | 'Shipped' | 'Delivered' | 'Cancelled';
   shippingAddress: {
     name: string;
     address: string;
     city: string;
     state: string;
     zip: string;
+    country: string;
   };
+  transactionId?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AppUser {
@@ -46,5 +60,11 @@ export interface AppUser {
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
-    role: 'ADMIN' | 'CUSTOMER';
+    role: Role;
+}
+
+export type OrderItemInput = {
+    productId: string;
+    quantity: number;
+    price: number;
 }

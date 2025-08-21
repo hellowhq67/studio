@@ -1,10 +1,12 @@
 'use server';
 
 import { z } from 'zod';
-import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { Category, Product } from '@prisma/client';
+import type { Product } from '@/lib/types';
+import { mockProducts } from '@/lib/mock-data';
+
+type Category = 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -51,16 +53,19 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { images, tags, ...productData } = validatedFields.data;
     
-    await prisma.product.create({
-      data: {
-        ...productData,
-        tags: tags.split(',').map(tag => tag.trim()),
-        images: images.split(',').map(img => img.trim()),
-        category: validatedFields.data.category as Category,
-        rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3, // mock rating
-        reviewCount: Math.floor(Math.random() * 200), // mock review count
-      }
-    });
+    const newProduct: Product = {
+      id: `prod_${new Date().getTime()}`,
+      ...productData,
+      tags: tags.split(',').map(tag => tag.trim()),
+      images: images.split(',').map(img => img.trim()),
+      category: validatedFields.data.category as Category,
+      rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3, // mock rating
+      reviewCount: Math.floor(Math.random() * 200), // mock review count
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    mockProducts.unshift(newProduct);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -73,17 +78,14 @@ export async function addProduct(prevState: any, formData: FormData) {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-  return products;
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return JSON.parse(JSON.stringify(mockProducts));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    const product = await prisma.product.findUnique({
-        where: { id }
-    });
-    return product;
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const product = mockProducts.find(p => p.id === id) || null;
+    return JSON.parse(JSON.stringify(product));
 }

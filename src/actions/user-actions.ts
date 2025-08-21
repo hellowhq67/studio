@@ -1,31 +1,25 @@
-// @/actions/user-actions.ts
 'use server';
 
-import prisma from '@/lib/prisma';
-import type { Role } from '@prisma/client';
+import type { Role } from '@/lib/types';
+
+// Mock user roles. In a real app, you'd fetch this from your database.
+const mockUserRoles: { [firebaseUid: string]: Role } = {
+    // Add mock users here if needed, e.g.
+    // 'admin-uid': 'ADMIN'
+};
 
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseUid },
-            select: { role: true }
-        });
-        // The role is guaranteed to be there if the user exists, default to CUSTOMER if not found.
-        return user?.role || 'CUSTOMER';
-    } catch (error) {
-        console.error("Failed to fetch user role:", error);
-        // Default to the least privileged role in case of an error.
-        return 'CUSTOMER';
+    // For demonstration, we'll make a specific user an admin.
+    // In a real app, you would look this up in your database.
+    if (firebaseUid === 'S5fchz9p6pTKVmB9l3v4a2aX8yI2') { // A mock admin UID
+        return 'ADMIN';
     }
+    return mockUserRoles[firebaseUid] || 'CUSTOMER';
 }
 
 export async function createUserInDb(data: { firebaseUid: string; email: string; name: string; }) {
-     await prisma.user.create({
-        data: {
-            firebaseUid: data.firebaseUid,
-            email: data.email,
-            name: data.name,
-            role: 'CUSTOMER' // Default role for new users
-        }
-    });
+    // This is a mock function. In a real app, this would create a user in the database.
+    console.log('Mock: Creating user in DB', data);
+    mockUserRoles[data.firebaseUid] = 'CUSTOMER';
+    return Promise.resolve();
 }

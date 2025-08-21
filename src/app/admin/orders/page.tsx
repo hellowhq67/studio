@@ -8,8 +8,13 @@ import { MoreHorizontal, File, Loader2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { getAllOrders } from '@/actions/order-actions';
 import { useCurrency } from '@/hooks/useCurrency';
-import type { Order, User } from '@prisma/client';
+import type { Order } from '@/lib/types';
 
+interface User {
+    id: string;
+    name: string | null;
+    email: string | null;
+}
 type EnrichedOrder = Order & { user: User };
 
 export default function AdminOrdersPage() {

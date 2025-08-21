@@ -12,7 +12,7 @@ import {
 import { auth } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import { getUserRole, createUserInDb } from '@/actions/user-actions';
-import type { Role } from '@prisma/client';
+import type { Role } from '@/lib/types';
 
 
 export interface AppUser {
@@ -67,7 +67,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName });
       
-      // Create user in your Postgres DB via Prisma
+      // Create user in your mock DB
       if (userCredential.user.email) {
         await createUserInDb({
             firebaseUid: userCredential.user.uid,

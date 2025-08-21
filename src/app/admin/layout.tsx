@@ -35,13 +35,13 @@ export default function AdminLayout({
     if (!loading) {
       if (!user) {
         router.push('/login');
-      } else if (user.role !== 'admin') {
+      } else if (user.role !== 'ADMIN') {
         router.push('/account'); // Redirect non-admins
       }
     }
   }, [user, loading, router]);
 
-  if (loading || !user || user.role !== 'admin') {
+  if (loading || !user || user.role !== 'ADMIN') {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
