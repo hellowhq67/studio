@@ -2,29 +2,29 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id          String @id @default(cuid())
-  firebaseUid String @unique
-  email       String @unique
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique
+  email       String   @unique
   name        String
-  role        Role   @default(CUSTOMER)
+  role        Role     @default(CUSTOMER)
   orders      Order[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 enum Role {
-  ADMIN
   CUSTOMER
+  ADMIN
 }
 
 model Product {
@@ -36,16 +36,18 @@ model Product {
   salePrice       Float?
   specialPrice    Float?
   couponCode      String?
-  deliveryCharge  Float
-  quantity        Int
+  deliveryCharge  Float?       @default(0)
+  quantity        Int?         @default(0)
   deliveryTime    String
   category        Category
   brand           String
   images          String[]
   tags            String[]
-  orderItems      OrderItem[]
+  rating          Float        @default(0)
+  reviewCount     Int          @default(0)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+  orderItems      OrderItem[]
 }
 
 enum Category {
@@ -56,25 +58,24 @@ enum Category {
 }
 
 model Order {
-  id              String   @id @default(cuid())
-  user            User     @relation(fields: [userId], references: [id])
+  id              String      @id @default(cuid())
   userId          String
+  user            User        @relation(fields: [userId], references: [id])
   items           OrderItem[]
   total           Float
-  status          String // e.g., 'Processing', 'Paid', 'Shipped', 'Delivered', 'Cancelled'
-  transactionId   String?  @unique
+  status          String // Processing, Paid, Failed, etc.
+  transactionId   String?     @unique
   shippingAddress Json
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
-  order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
-  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
   productId String
+  product   Product @relation(fields: [productId], references: [id])
   quantity  Int
-  price     Float // Price at the time of purchase
-  createdAt DateTime @default(now())
+  price     Float
 }
