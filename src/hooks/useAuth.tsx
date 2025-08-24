@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { createAuthClient, type AuthClient } from 'better-auth/react';
 import { Loader2 } from 'lucide-react';
 import type { Role } from '@/lib/types';
-import { getUserRole } from '@/actions/user-actions';
-import { createUserInDb } from '@/actions/user-actions';
+import { getUserRole, createUserInDb } from '@/actions/user-actions';
+
 
 export interface AppUser {
     uid: string;

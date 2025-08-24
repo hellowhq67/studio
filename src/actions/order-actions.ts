@@ -1,7 +1,8 @@
 'use server';
 
-import { mockOrders, mockProducts } from '@/lib/mock-data';
-import type { CartItem, Order, OrderItemInput } from '@/lib/types';
+import type { Order, OrderItemInput } from '@/lib/types';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 export async function createOrder(
   firebaseUid: string,
@@ -12,29 +13,27 @@ export async function createOrder(
   status: 'Processing' | 'Paid' | 'Failed' = 'Processing'
 ): Promise<Order | null> {
   try {
-    // In a real app, you would find a user, but here we just assign a mock userId
-    const userId = 'user_1'; // Mock user ID
-
-    const newOrder: Order = {
-      id: `order_${new Date().getTime()}`,
-      userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      total,
-      status: status,
-      transactionId: transactionId,
-      shippingAddress,
-      items: items.map(item => ({
-        id: `order_item_${new Date().getTime()}_${item.productId}`,
-        orderId: `order_${new Date().getTime()}`,
-        productId: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-    };
-    
-    mockOrders.unshift(newOrder); // Add to the beginning of the array
-    return newOrder;
+    const order = await prisma.order.create({
+        data: {
+            userId: firebaseUid,
+            total,
+            status,
+            shippingAddress: JSON.stringify(shippingAddress),
+            transactionId,
+            items: {
+                create: items.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
+            }
+        },
+        include: {
+            items: true
+        }
+    });
+    revalidatePath('/account');
+    return JSON.parse(JSON.stringify(order));
   } catch (error) {
     console.error('Error creating order:', error);
     return null;
@@ -43,33 +42,21 @@ export async function createOrder(
 
 export async function getUserOrders(firebaseUid: string): Promise<any[]> {
     try {
-        // Mock finding user and their orders. In this mock, we return all orders for simplicity
-        const orders = mockOrders.map(order => {
-            const enrichedItems = order.items.map(item => {
-                const product = mockProducts.find(p => p.id === item.productId);
-                return {
-                    ...item,
-                    product
+        const orders = await prisma.order.findMany({
+            where: { userId: firebaseUid },
+            include: {
+                items: {
+                    include: {
+                        product: true
+                    }
                 }
-            });
-            return {
-                ...order,
-                date: order.createdAt.toISOString(),
-                items: enrichedItems,
-                user: { id: order.userId, name: 'Mock User', email: 'mock@example.com' } // Mock user
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
 
-        return orders.map(order => ({
-            id: order.id,
-            date: order.date,
-            status: order.status,
-            total: order.total,
-            items: order.items.map(item => ({
-                quantity: item.quantity,
-                product: item.product
-            }))
-        }));
+        return JSON.parse(JSON.stringify(orders.map(o => ({...o, date: o.createdAt}))));
 
     } catch (error) {
         console.error("Failed to fetch user orders:", error);
@@ -79,23 +66,21 @@ export async function getUserOrders(firebaseUid: string): Promise<any[]> {
 
 export async function getAllOrders() {
   try {
-      const orders = mockOrders.map(order => {
-        const enrichedItems = order.items.map(item => {
-            const product = mockProducts.find(p => p.id === item.productId);
-            return {
-                ...item,
-                product
-            }
-        });
-        return {
-            ...order,
-            date: order.createdAt.toISOString(),
-            items: enrichedItems,
-            user: { id: order.userId, name: 'Mock User', email: 'mock@example.com' } // Mock user
-        }
-    });
+      const orders = await prisma.order.findMany({
+          include: {
+              user: true,
+              items: {
+                  include: {
+                      product: true
+                  }
+              }
+          },
+          orderBy: {
+              createdAt: 'desc'
+          }
+      });
 
-    return orders;
+    return JSON.parse(JSON.stringify(orders.map(o => ({...o, date: o.createdAt}))));
   } catch (error) {
     console.error("Failed to fetch all orders:", error);
     return [];

@@ -5,9 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { mockProducts } from '@/lib/mock-data';
-
-type Category = 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
+import prisma from '@/lib/prisma';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -16,9 +14,6 @@ const ProductSchema = z.object({
   tags: z.string().min(1, 'Please add at least one tag'),
   price: z.coerce.number().positive('Price must be positive'),
   salePrice: z.coerce.number().optional(),
-  specialPrice: z.coerce.number().optional(),
-  couponCode: z.string().optional(),
-  deliveryCharge: z.coerce.number().min(0, 'Delivery charge cannot be negative').optional(),
   quantity: z.coerce.number().int().min(0, 'Quantity cannot be negative').optional(),
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
@@ -34,9 +29,6 @@ export async function addProduct(prevState: any, formData: FormData) {
     tags: formData.get('tags'),
     price: formData.get('price'),
     salePrice: formData.get('salePrice'),
-    specialPrice: formData.get('specialPrice'),
-    couponCode: formData.get('couponCode'),
-    deliveryCharge: formData.get('deliveryCharge'),
     quantity: formData.get('quantity'),
     deliveryTime: formData.get('deliveryTime'),
     category: formData.get('category'),
@@ -52,21 +44,15 @@ export async function addProduct(prevState: any, formData: FormData) {
   }
 
   try {
-    const { images, tags, ...productData } = validatedFields.data;
+    const { ...productData } = validatedFields.data;
     
-    const newProduct: Product = {
-      id: `prod_${new Date().getTime()}`,
-      ...productData,
-      tags: tags.split(',').map(tag => tag.trim()),
-      images: images.split(',').map(img => img.trim()),
-      category: validatedFields.data.category as Category,
-      rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3, // mock rating
-      reviewCount: Math.floor(Math.random() * 200), // mock review count
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    
-    mockProducts.unshift(newProduct);
+    await prisma.product.create({
+      data: {
+        ...productData,
+        rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3,
+        reviewCount: Math.floor(Math.random() * 200),
+      }
+    });
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -78,18 +64,28 @@ export async function addProduct(prevState: any, formData: FormData) {
   redirect('/admin/products');
 }
 
+function mapDbProductToAppProduct(dbProduct: any): Product {
+    return {
+        ...dbProduct,
+        tags: typeof dbProduct.tags === 'string' ? dbProduct.tags.split(',').map((t: string) => t.trim()) : [],
+        images: typeof dbProduct.images === 'string' ? dbProduct.images.split(',').map((i: string) => i.trim()) : [],
+    }
+}
+
+
 export async function getProducts(): Promise<Product[]> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // Dates are not serializable, so we need to convert them to strings
-  return JSON.parse(JSON.stringify(mockProducts));
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return JSON.parse(JSON.stringify(products.map(mapDbProductToAppProduct)));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const product = mockProducts.find(p => p.id === id) || null;
+    const product = await prisma.product.findUnique({
+        where: { id }
+    });
     if (!product) return null;
-    // Dates are not serializable, so we need to convert them to strings
-    return JSON.parse(JSON.stringify(product));
+    return JSON.parse(JSON.stringify(mapDbProductToAppProduct(product)));
 }

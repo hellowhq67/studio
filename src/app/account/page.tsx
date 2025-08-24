@@ -8,26 +8,15 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
-import type { Order } from '@/lib/types';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getUserOrders } from '@/actions/order-actions';
-import type { Product } from '@/lib/types';
-
-interface EnrichedOrderItem {
-  quantity: number;
-  product: Product;
-}
-
-interface EnrichedOrder extends Omit<Order, 'items'> {
-    items: EnrichedOrderItem[];
-    date: string;
-}
+import type { Order } from '@/lib/types';
 
 
 export default function AccountPage() {
   const { user } = useAuth();
   const { formatPrice } = useCurrency();
-  const [orders, setOrders] = useState<EnrichedOrder[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,7 +24,7 @@ export default function AccountPage() {
       if (user) {
         try {
           const userOrders = await getUserOrders(user.uid);
-           setOrders(userOrders as EnrichedOrder[]);
+           setOrders(userOrders);
         } catch (error) {
           console.error('Error fetching orders:', error);
         } finally {
@@ -87,7 +76,7 @@ export default function AccountPage() {
                     orders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell className="font-medium">{order.id.substring(0, 7)}</TableCell>
-                        <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell>{order.items.reduce((acc, item) => acc + item.quantity, 0)}</TableCell>
                         <TableCell>{formatPrice(order.total)}</TableCell>
                         <TableCell>{order.status}</TableCell>

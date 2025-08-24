@@ -1,60 +1,65 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
-}
-
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String   @id @default(cuid())
-  firebaseUid String   @unique
-  email       String   @unique
-  name        String
-  role        Role     @default(CUSTOMER)
-  orders      Order[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+generator client {
+  provider        = "prisma-client-js"
 }
 
-enum Role {
-  CUSTOMER
-  ADMIN
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  name          String?
+  role          String    @default("CUSTOMER")
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  expires DateTime
+
+  @@unique([id, token])
 }
 
 model Product {
-  id              String       @id @default(cuid())
-  name            String
-  description     String
-  longDescription String
-  price           Float
-  salePrice       Float?
-  specialPrice    Float?
-  couponCode      String?
-  deliveryCharge  Float?       @default(0)
-  quantity        Int?         @default(0)
-  deliveryTime    String
-  category        Category
-  brand           String
-  images          String[]
-  tags            String[]
-  rating          Float        @default(0)
-  reviewCount     Int          @default(0)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  orderItems      OrderItem[]
-}
-
-enum Category {
-  Skincare
-  Makeup
-  Haircare
-  Fragrance
+  id               String   @id @default(cuid())
+  name             String
+  description      String
+  longDescription  String
+  price            Float
+  salePrice        Float?
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+  category         String
+  images           String // Comma-separated URLs
+  tags             String   // Comma-separated tags
+  quantity         Int?
+  deliveryTime     String
+  brand            String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  OrderItem        OrderItem[]
 }
 
 model Order {
@@ -63,9 +68,9 @@ model Order {
   user            User        @relation(fields: [userId], references: [id])
   items           OrderItem[]
   total           Float
-  status          String // Processing, Paid, Failed, etc.
-  transactionId   String?     @unique
-  shippingAddress Json
+  status          String      @default("Processing")
+  shippingAddress String
+  transactionId   String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
