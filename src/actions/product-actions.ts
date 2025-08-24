@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -80,6 +81,7 @@ export async function addProduct(prevState: any, formData: FormData) {
 export async function getProducts(): Promise<Product[]> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
+  // Dates are not serializable, so we need to convert them to strings
   return JSON.parse(JSON.stringify(mockProducts));
 }
 
@@ -87,5 +89,7 @@ export async function getProductById(id: string): Promise<Product | null> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
     const product = mockProducts.find(p => p.id === id) || null;
+    if (!product) return null;
+    // Dates are not serializable, so we need to convert them to strings
     return JSON.parse(JSON.stringify(product));
 }
