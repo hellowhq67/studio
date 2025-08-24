@@ -1,14 +1,14 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/lib/db";
-import * as schema from '@/lib/db/schema';
+// The drizzleAdapter import is removed as it's causing build issues.
+// We will re-evaluate the database integration for auth later.
 
 export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
-    database: drizzleAdapter(db, {
-      provider: "pg",
-      schema,
-    }),
+    // The database adapter configuration is temporarily removed.
+    // database: drizzleAdapter(db, {
+    //   provider: "pg",
+    //   schema,
+    // }),
 });
