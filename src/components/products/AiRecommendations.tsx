@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getProductRecommendations } from '@/ai/flows/product-recommendations';
+import {useEffect, useState} from 'react';
 import ProductCard from './ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Product } from '@/lib/types';
@@ -38,16 +37,23 @@ export default function AiRecommendations({ currentProduct }: AiRecommendationsP
       setError(null);
       try {
         const browsingHistory = JSON.parse(localStorage.getItem('browsingHistory') || '[]').join(', ');
-        
-        const result = await getProductRecommendations({
-          browsingHistory,
-          productDescription: currentProduct.longDescription,
+
+        const response = await fetch('/api/recommendations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            browsingHistory,
+            productDescription: currentProduct.longDescription,
+          }),
         });
+        const result = await response.json();
 
         if (result && result.recommendedProducts) {
           const recommended = result.recommendedProducts
-            .map(name => allProducts.find(p => p.name.toLowerCase() === name.toLowerCase()))
-            .filter((p): p is Product => !!p && p.id !== currentProduct.id)
+            .map((name: string) => allProducts.find(p => p.name.toLowerCase() === name.toLowerCase()))
+            .filter((p: { id: string; }): p is Product => !!p && p.id !== currentProduct.id)
             .slice(0, 3); // Limit to 3 recommendations
           setRecommendations(recommended);
         } else {
