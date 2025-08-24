@@ -7,7 +7,7 @@ export const roleEnum = pgEnum('role', ['ADMIN', 'CUSTOMER']);
 export const orderStatusEnum = pgEnum('order_status', ['Processing', 'Paid', 'Failed', 'Shipped', 'Delivered']);
 
 export const users = pgTable('users', {
-  id: varchar('id').primaryKey(), // Firebase UID
+  id: text('id').primaryKey(), // Firebase UID
   name: text('name'),
   email: text('email').notNull().unique(),
   role: roleEnum('role').default('CUSTOMER').notNull(),
@@ -36,7 +36,7 @@ export const products = pgTable('products', {
 
 export const orders = pgTable('orders', {
   id: varchar('id').primaryKey().$defaultFn(() => `ord_${crypto.randomUUID()}`),
-  userId: varchar('user_id').notNull().references(() => users.id),
+  userId: text('user_id').notNull().references(() => users.id),
   total: decimal('total', { precision: 10, scale: 2 }).notNull(),
   status: orderStatusEnum('status').default('Processing').notNull(),
   shippingAddress: jsonb('shipping_address').notNull(),
