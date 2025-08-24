@@ -2,7 +2,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +11,9 @@ import { useEffect, useState } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getUserOrders } from '@/actions/order-actions';
 import type { Order } from '@/lib/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 
 export default function AccountPage() {
@@ -18,6 +21,11 @@ export default function AccountPage() {
   const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  }
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -94,20 +102,61 @@ export default function AccountPage() {
               <CardTitle>Profile Information</CardTitle>
               <CardDescription>Manage your personal and shipping details.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" defaultValue={user?.displayName || ''} disabled />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Saved Shipping Address</Label>
-                <Input id="address" defaultValue="No address saved yet." disabled />
-              </div>
+            <CardContent>
+                <form className="space-y-8">
+                     <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16">
+                            <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                            <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <h3 className="text-lg font-semibold">{user?.displayName}</h3>
+                            <p className="text-sm text-muted-foreground">{user?.email}</p>
+                        </div>
+                    </div>
+                    <Separator />
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input id="name" defaultValue={user?.displayName || ''} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
+                             <p className="text-xs text-muted-foreground">Email address cannot be changed.</p>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+                        <div className="space-y-4">
+                             <div className="space-y-2">
+                                <Label htmlFor="address">Address</Label>
+                                <Input id="address" placeholder="123 Beauty Lane" />
+                            </div>
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="city">City</Label>
+                                    <Input id="city" placeholder="Glamour City" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="state">State</Label>
+                                    <Input id="state" placeholder="CA" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="zip">ZIP Code</Label>
+                                    <Input id="zip" placeholder="90210" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+                <div className="flex justify-end gap-2 w-full">
+                    <Button variant="outline">Cancel</Button>
+                    <Button>Save Changes</Button>
+                </div>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
