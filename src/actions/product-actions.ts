@@ -1,11 +1,13 @@
-
 'use server';
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import prisma from '@/lib/prisma';
+import { db } from '@/lib/db';
+import * as schema from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -46,12 +48,13 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { ...productData } = validatedFields.data;
     
-    await prisma.product.create({
-      data: {
+    await db.insert(schema.products).values({
+        id: randomUUID(),
         ...productData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3,
         reviewCount: Math.floor(Math.random() * 200),
-      }
     });
 
   } catch (error) {
@@ -72,19 +75,16 @@ function mapDbProductToAppProduct(dbProduct: any): Product {
     }
 }
 
-
 export async function getProducts(): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
+  const products = await db.query.products.findMany({
+    orderBy: (products, { desc }) => [desc(products.createdAt)],
   });
   return JSON.parse(JSON.stringify(products.map(mapDbProductToAppProduct)));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    const product = await prisma.product.findUnique({
-        where: { id }
+    const product = await db.query.products.findFirst({
+        where: eq(schema.products.id, id)
     });
     if (!product) return null;
     return JSON.parse(JSON.stringify(mapDbProductToAppProduct(product)));
