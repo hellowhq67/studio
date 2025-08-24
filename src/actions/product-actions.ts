@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { db } from '@/lib/db';
-import { products } from '@/lib/db/schema';
+import { db } from '@/db';
+import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 const ProductSchema = z.object({

@@ -2,8 +2,8 @@
 'use server';
 
 import type { Role } from '@/lib/types';
-import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
+import { db } from '@/db';
+import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 

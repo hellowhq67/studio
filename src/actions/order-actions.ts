@@ -3,8 +3,8 @@
 
 import type { Order, OrderItemInput } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/lib/db';
-import { orders, orderItems, users as usersSchema, products as productsSchema } from '@/lib/db/schema';
+import { db } from '@/db';
+import { orders, orderItems, users as usersSchema, products as productsSchema } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 // This function needs to be adapted based on how you want to handle product/user details.
