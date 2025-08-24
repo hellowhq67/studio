@@ -1,19 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  User as FirebaseUser,
-  onAuthStateChanged, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut,
-  updateProfile
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { createAuthClient, type AuthClient } from 'better-auth/react';
 import { Loader2 } from 'lucide-react';
-import { getUserRole, createUserInDb } from '@/actions/user-actions';
 import type { Role } from '@/lib/types';
-
+import { getUserRole } from '@/actions/user-actions';
+import { createUserInDb } from '@/actions/user-actions';
 
 export interface AppUser {
     uid: string;
@@ -26,88 +18,77 @@ export interface AppUser {
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signup: (email: string, password: string, displayName: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  signup: (email: string, password: string, displayName: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<any>;
+  logout: () => Promise<any>;
+  client: AuthClient;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const authClient = createAuthClient();
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserWithRole = useCallback(async (firebaseUser: FirebaseUser): Promise<AppUser> => {
-    const role = await getUserRole(firebaseUser.uid);
-    return { 
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        role: role
-    };
-  }, []);
+  const { useSession } = authClient;
+  const session = useSession();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const appUser = await fetchUserWithRole(firebaseUser);
-        setUser(appUser);
+    const checkSession = async () => {
+      if (session.status === 'authenticated') {
+        const betterAuthUser = session.data.user;
+        const role = await getUserRole(betterAuthUser.id);
+        setUser({
+          uid: betterAuthUser.id,
+          email: betterAuthUser.email,
+          displayName: betterAuthUser.name,
+          photoURL: betterAuthUser.image,
+          role: role,
+        });
       } else {
         setUser(null);
       }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, [fetchUserWithRole]);
+       setLoading(false);
+    };
 
-  const signup = useCallback(async (email: string, password: string, displayName: string) => {
-    setLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, { displayName });
-      
-      // Create user in your mock DB
-      if (userCredential.user.email) {
-        await createUserInDb({
-            firebaseUid: userCredential.user.uid,
-            email: userCredential.user.email,
-            name: displayName
-        });
-      }
-      
-      const appUser = await fetchUserWithRole(userCredential.user);
-      setUser(appUser);
-    } finally {
-      setLoading(false);
+    if (session.status !== 'loading') {
+       checkSession();
     }
-  }, [fetchUserWithRole]);
+  }, [session.status, session.data]);
+  
+  const signup = useCallback(async (email: string, password: string, displayName: string) => {
+    const result = await authClient.signUp("email", { email, password, name: displayName });
+    if (result.success) {
+      await createUserInDb({
+        firebaseUid: result.data.user.id,
+        email,
+        name: displayName
+      })
+    }
+    return result;
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // onAuthStateChanged will handle fetching the user role
-    } finally {
-      setLoading(false);
-    }
+    return authClient.signIn("email", { email, password });
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut(auth);
-    setUser(null);
+    await authClient.signOut();
   }, []);
 
   const value = useMemo(() => ({
     user,
-    loading,
+    loading: session.status === 'loading' || loading,
     signup,
     login,
     logout,
-  }), [user, loading, signup, login, logout]);
-
-  if (loading && user === undefined) {
-    return (
+    client: authClient
+  }), [user, session.status, loading, signup, login, logout]);
+  
+  if (value.loading) {
+     return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
         </div>
