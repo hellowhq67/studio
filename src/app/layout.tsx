@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer';
 import { AuthProvider } from '@/hooks/useAuth';
 import { Inter } from 'next/font/google';
 import { CurrencyProvider } from '@/hooks/useCurrency';
+import { app } from '@/lib/firebase'; // Ensure firebase is initialized
 
 const inter = Inter({ 
   subsets: ['latin'],

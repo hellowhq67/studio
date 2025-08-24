@@ -1,11 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { createAuthClient, type AuthClient } from 'better-auth/react';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, type User as FirebaseUser } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { Role } from '@/lib/types';
 import { getUserRole, createUserInDb } from '@/actions/user-actions';
 
+const auth = getAuth(app);
 
 export interface AppUser {
     uid: string;
@@ -21,73 +23,72 @@ interface AuthContextType {
   signup: (email: string, password: string, displayName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
-  client: AuthClient;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const authClient = createAuthClient();
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const { useSession } = authClient;
-  const session = useSession();
-
   useEffect(() => {
-    const checkSession = async () => {
-      if (session.status === 'authenticated') {
-        const betterAuthUser = session.data.user;
-        const role = await getUserRole(betterAuthUser.id);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const role = await getUserRole(firebaseUser.uid);
         setUser({
-          uid: betterAuthUser.id,
-          email: betterAuthUser.email,
-          displayName: betterAuthUser.name,
-          photoURL: betterAuthUser.image,
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
           role: role,
         });
       } else {
         setUser(null);
       }
-       setLoading(false);
-    };
+      setLoading(false);
+    });
 
-    if (session.status !== 'loading') {
-       checkSession();
-    }
-  }, [session.status, session.data]);
+    return () => unsubscribe();
+  }, []);
   
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
-    const result = await authClient.signUp("email", { email, password, name: displayName });
-    if (result.success) {
-      await createUserInDb({
-        firebaseUid: result.data.user.id,
-        email,
-        name: displayName
-      })
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName });
+        await createUserInDb({
+            firebaseUid: userCredential.user.uid,
+            email: userCredential.user.email,
+            name: displayName,
+        });
+        const role = await getUserRole(userCredential.user.uid);
+        setUser({
+            uid: userCredential.user.uid,
+            email: userCredential.user.email,
+            displayName: displayName,
+            photoURL: userCredential.user.photoURL,
+            role: role
+        });
     }
-    return result;
+    return userCredential;
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    return authClient.signIn("email", { email, password });
+    return signInWithEmailAndPassword(auth, email, password);
   }, []);
 
   const logout = useCallback(async () => {
-    await authClient.signOut();
+    await signOut(auth);
   }, []);
 
   const value = useMemo(() => ({
     user,
-    loading: session.status === 'loading' || loading,
+    loading,
     signup,
     login,
     logout,
-    client: authClient
-  }), [user, session.status, loading, signup, login, logout]);
+  }), [user, loading, signup, login, logout]);
   
-  if (value.loading) {
+  if (loading) {
      return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
