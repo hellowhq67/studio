@@ -1,24 +1,35 @@
 'use server';
 
 import type { Role } from '@/lib/types';
+import { db } from '@/lib/db';
+import * as schema from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-// Mock function to simulate fetching user role
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    // In a real app, you'd fetch this from your database.
-    // For now, we can default to CUSTOMER or check a mock list.
-    // Let's assume all users are CUSTOMERs for now.
-    // A more advanced mock could check if the UID matches a mock admin UID.
-    if (firebaseUid === 'mock-admin-uid') {
-        return 'ADMIN';
+    try {
+        const user = await db.query.user.findFirst({
+            where: eq(schema.user.id, firebaseUid),
+            columns: { role: true }
+        });
+        return user?.role || 'CUSTOMER';
+    } catch {
+        return 'CUSTOMER';
     }
-    return 'CUSTOMER';
 }
 
-// Mock function to simulate creating a user record
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
-    // This is a mock function. In a real application, you would create a new
-    // user record in your database here.
-    console.log('Mock: Creating user in DB:', data);
-    // No operation needed for mock data setup.
-    return Promise.resolve();
+   if (!data.email) {
+     throw new Error("Email is required to create a user.");
+   }
+   try {
+     await db.insert(schema.user).values({
+        id: data.firebaseUid,
+        email: data.email,
+        name: data.name,
+        role: 'CUSTOMER'
+     }).onConflictDoNothing();
+   } catch (error) {
+    console.error("Failed to create user in DB:", error);
+    // Decide if you want to throw the error or handle it gracefully
+   }
 }

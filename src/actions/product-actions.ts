@@ -4,7 +4,8 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { products as mockProducts } from '@/lib/mock-data';
+import { db } from '@/lib/db';
+import * as schema from '@/lib/db/schema';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -45,18 +46,18 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { images, tags, ...productData } = validatedFields.data;
     
-    const newProduct: Product = {
+    const newProduct: Omit<Product, 'createdAt' | 'updatedAt' | 'rating' | 'reviewCount' | 'images' | 'tags'> & { images: string[], tags: string[], createdAt: Date, updatedAt: Date, rating: number, reviewCount: number} = {
         id: `prod_${Date.now()}`,
         ...productData,
         images: images.split(',').map(i => i.trim()),
         tags: tags.split(',').map(t => t.trim()),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3,
         reviewCount: Math.floor(Math.random() * 200),
     }
-    
-    mockProducts.unshift(newProduct);
+
+    await db.insert(schema.product).values(newProduct);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -71,13 +72,16 @@ export async function addProduct(prevState: any, formData: FormData) {
 export async function getProducts(): Promise<Product[]> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return JSON.parse(JSON.stringify(mockProducts));
+  const products = await db.select().from(schema.product);
+  return JSON.parse(JSON.stringify(products));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
     // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  const product = mockProducts.find(p => p.id === id);
+  const product = await db.query.product.findFirst({
+      where: (products, { eq }) => eq(products.id, id),
+  });
   if (!product) return null;
   return JSON.parse(JSON.stringify(product));
 }
