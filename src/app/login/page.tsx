@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -39,9 +40,10 @@ const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function LoginPage() {
-  const { login, loading } = useAuth();
+  const { login, signInWithGoogle, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -63,6 +65,23 @@ export default function LoginPage() {
         title: 'Login Failed',
         description: error.message || 'An unexpected error occurred.',
       });
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      toast({ title: "Login Successful", description: "Welcome!" });
+      router.push('/account');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Google Sign-In Failed',
+        description: error.message || 'An unexpected error occurred.',
+      });
+    } finally {
+        setGoogleLoading(false);
     }
   };
 
@@ -135,8 +154,8 @@ export default function LoginPage() {
                 <span className="mx-4 text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1 bg-border/50" />
               </div>
-              <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50">
-                <GoogleIcon className="mr-2 h-5 w-5"/>
+              <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50" onClick={handleGoogleSignIn} disabled={googleLoading}>
+                {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5"/>}
                 Sign in with Google
               </Button>
               <Button variant="outline" className="w-full h-12 border-black bg-black text-white hover:bg-gray-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-gray-200">

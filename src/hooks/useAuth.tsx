@@ -1,13 +1,24 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, type User as FirebaseUser } from 'firebase/auth';
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut, 
+    updateProfile, 
+    GoogleAuthProvider,
+    signInWithPopup,
+    type User as FirebaseUser 
+} from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { Role } from '@/lib/types';
 import { getUserRole, createUserInDb } from '@/actions/user-actions';
 
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
 export interface AppUser {
     uid: string;
@@ -22,6 +33,7 @@ interface AuthContextType {
   loading: boolean;
   signup: (email: string, password: string, displayName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
   logout: () => Promise<any>;
 }
 
@@ -31,17 +43,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUserRoleAndSetUser = useCallback(async (firebaseUser: FirebaseUser) => {
+      const role = await getUserRole(firebaseUser.uid);
+      setUser({
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        role: role,
+      });
+  }, []);
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        const role = await getUserRole(firebaseUser.uid);
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          role: role,
-        });
+        await fetchUserRoleAndSetUser(firebaseUser);
       } else {
         setUser(null);
       }
@@ -49,7 +66,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [fetchUserRoleAndSetUser]);
   
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -60,21 +77,29 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: userCredential.user.email,
             name: displayName,
         });
-        const role = await getUserRole(userCredential.user.uid);
-        setUser({
-            uid: userCredential.user.uid,
-            email: userCredential.user.email,
-            displayName: displayName,
-            photoURL: userCredential.user.photoURL,
-            role: role
-        });
+        await fetchUserRoleAndSetUser(userCredential.user);
     }
     return userCredential;
-  }, []);
+  }, [fetchUserRoleAndSetUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   }, []);
+
+  const signInWithGoogle = useCallback(async () => {
+    const userCredential = await signInWithPopup(auth, googleProvider);
+    if (userCredential.user) {
+        // This function also handles creating the user in the DB if they don't exist
+        await createUserInDb({
+            firebaseUid: userCredential.user.uid,
+            email: userCredential.user.email,
+            name: userCredential.user.displayName,
+        });
+       await fetchUserRoleAndSetUser(userCredential.user);
+    }
+    return userCredential;
+  }, [fetchUserRoleAndSetUser]);
+
 
   const logout = useCallback(async () => {
     await signOut(auth);
@@ -85,10 +110,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     signup,
     login,
+    signInWithGoogle,
     logout,
-  }), [user, loading, signup, login, logout]);
+  }), [user, loading, signup, login, signInWithGoogle, logout]);
   
-  if (loading) {
+  if (loading && !user) {
      return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
