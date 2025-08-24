@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { db } from '@/db';
+import { db } from '@/index';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 

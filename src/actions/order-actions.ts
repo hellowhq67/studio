@@ -3,7 +3,7 @@
 
 import type { Order, OrderItemInput } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/db';
+import { db } from '@/index';
 import { orders, orderItems, users as usersSchema, products as productsSchema } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
