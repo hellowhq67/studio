@@ -1,30 +1,24 @@
 'use server';
 
 import type { Role } from '@/lib/types';
-import { db } from '@/lib/db';
-import * as schema from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
 
-
+// Mock function to simulate fetching user role
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    const user = await db.query.users.findFirst({
-        where: eq(schema.users.id, firebaseUid)
-    });
-    return (user?.role as Role) || 'CUSTOMER';
+    // In a real app, you'd fetch this from your database.
+    // For now, we can default to CUSTOMER or check a mock list.
+    // Let's assume all users are CUSTOMERs for now.
+    // A more advanced mock could check if the UID matches a mock admin UID.
+    if (firebaseUid === 'mock-admin-uid') {
+        return 'ADMIN';
+    }
+    return 'CUSTOMER';
 }
 
+// Mock function to simulate creating a user record
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
-    try {
-        await db.update(schema.users)
-          .set({ 
-            email: data.email,
-            name: data.name,
-            role: 'CUSTOMER' // Default role
-          })
-          .where(eq(schema.users.id, data.firebaseUid));
-    } catch (error) {
-        // If user doesn't exist, this will fail. We can ignore this for now as better-auth creates user.
-        // A more robust implementation might use upsert.
-        console.log("Could not update user, probably because they were just created by better-auth.", error);
-    }
+    // This is a mock function. In a real application, you would create a new
+    // user record in your database here.
+    console.log('Mock: Creating user in DB:', data);
+    // No operation needed for mock data setup.
+    return Promise.resolve();
 }
