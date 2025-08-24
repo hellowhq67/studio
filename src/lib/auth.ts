@@ -1,5 +1,4 @@
-import { betterAuth } from "better-auth";
-import { createAdapter } from "better-auth/adapters";
+import { betterAuth, createAdapter } from "better-auth";
 
 const memoryDB = {
     user: [],
