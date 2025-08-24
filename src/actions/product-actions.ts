@@ -4,10 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { db } from '@/lib/db';
-import * as schema from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
-import { randomUUID } from 'crypto';
+import { products as mockProducts } from '@/lib/mock-data';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -46,16 +43,20 @@ export async function addProduct(prevState: any, formData: FormData) {
   }
 
   try {
-    const { ...productData } = validatedFields.data;
+    const { images, tags, ...productData } = validatedFields.data;
     
-    await db.insert(schema.products).values({
-        id: randomUUID(),
+    const newProduct: Product = {
+        id: `prod_${Date.now()}`,
         ...productData,
+        images: images.split(',').map(i => i.trim()),
+        tags: tags.split(',').map(t => t.trim()),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3,
         reviewCount: Math.floor(Math.random() * 200),
-    });
+    }
+    
+    mockProducts.unshift(newProduct);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -67,25 +68,16 @@ export async function addProduct(prevState: any, formData: FormData) {
   redirect('/admin/products');
 }
 
-function mapDbProductToAppProduct(dbProduct: any): Product {
-    return {
-        ...dbProduct,
-        tags: typeof dbProduct.tags === 'string' ? dbProduct.tags.split(',').map((t: string) => t.trim()) : [],
-        images: typeof dbProduct.images === 'string' ? dbProduct.images.split(',').map((i: string) => i.trim()) : [],
-    }
-}
-
 export async function getProducts(): Promise<Product[]> {
-  const products = await db.query.products.findMany({
-    orderBy: (products, { desc }) => [desc(products.createdAt)],
-  });
-  return JSON.parse(JSON.stringify(products.map(mapDbProductToAppProduct)));
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return JSON.parse(JSON.stringify(mockProducts));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    const product = await db.query.products.findFirst({
-        where: eq(schema.products.id, id)
-    });
-    if (!product) return null;
-    return JSON.parse(JSON.stringify(mapDbProductToAppProduct(product)));
+    // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  const product = mockProducts.find(p => p.id === id);
+  if (!product) return null;
+  return JSON.parse(JSON.stringify(product));
 }
