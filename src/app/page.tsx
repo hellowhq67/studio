@@ -27,7 +27,7 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="md:col-start-1">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight mb-4">
-              EVQ EVANIEGLOW Cosmetics
+              Evanie Glow Cosmetics
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
               Discover our new cosmetics. We believe in the power of nature to reveal your natural beauty and glow.

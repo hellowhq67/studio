@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'EVQ EVANIEGLOW',
-  description: 'Discover your radiance with EVQ EVANIEGLOW cosmetics.',
+  title: 'Evanie Glow',
+  description: 'Discover your radiance with Evanie Glow cosmetics.',
   icons: {
     icon: '/favicon.ico',
   },

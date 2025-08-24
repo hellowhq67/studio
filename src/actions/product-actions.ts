@@ -1,12 +1,13 @@
+
 'use server';
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { products as mockProducts } from '@/lib/mock-data';
-
-let products = [...mockProducts];
+import { db } from '@/lib/db';
+import { products } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -47,18 +48,13 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { images, tags, ...productData } = validatedFields.data;
     
-    const newProduct: Product = {
-        id: `prod_${Date.now()}`,
+    const newProduct: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'rating' | 'reviewCount'> & { images: string[], tags: string[]} = {
         ...productData,
         images: images.split(',').map(i => i.trim()),
         tags: tags.split(',').map(t => t.trim()),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        rating: Math.floor(Math.random() * (5 - 3 + 1)) + 3,
-        reviewCount: Math.floor(Math.random() * 200),
     }
 
-    products.unshift(newProduct);
+    await db.insert(products).values(newProduct);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -71,15 +67,24 @@ export async function addProduct(prevState: any, formData: FormData) {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return JSON.parse(JSON.stringify(products));
+  try {
+    const allProducts = await db.select().from(products);
+    // The schema defines non-nullable fields, so we can cast directly
+    // if we trust the database integrity. A safer approach might involve validation.
+    return allProducts as Product[];
+  } catch (error) {
+      console.error("Failed to fetch products:", error);
+      return [];
+  }
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const product = products.find(p => p.id === id);
-  if (!product) return null;
-  return JSON.parse(JSON.stringify(product));
+    try {
+        const productResult = await db.select().from(products).where(eq(products.id, id)).limit(1);
+        if (productResult.length === 0) return null;
+        return productResult[0] as Product;
+    } catch(error) {
+        console.error(`Failed to fetch product ${id}:`, error);
+        return null;
+    }
 }

@@ -22,7 +22,7 @@ const getInitialCart = (): CartItem[] => {
   if (typeof window === 'undefined') {
     return [];
   }
-  const savedCart = localStorage.getItem('evanieglow-cart-guest');
+  const savedCart = localStorage.getItem('evanie-glow-cart-guest');
   return savedCart ? JSON.parse(savedCart) : [];
 };
 
@@ -43,7 +43,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Save to localStorage whenever cart changes, regardless of auth state
     // This simplifies guest/user cart handling for now
-    localStorage.setItem('evanieglow-cart-guest', JSON.stringify(items));
+    localStorage.setItem('evanie-glow-cart-guest', JSON.stringify(items));
   }, [items]);
   
   const addItem = useCallback((product: Product, quantity: number) => {

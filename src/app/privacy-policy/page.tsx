@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
           <p>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
           <h2>1. Introduction</h2>
-          <p>Welcome to EVANIEGLOW. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+          <p>Welcome to Evanie Glow. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
 
           <h2>2. Information We Collect</h2>
           <p>We may collect personal information from you such as your name, shipping address, email address, and payment information when you place an order. We also collect information automatically as you navigate the site, such as your IP address and browsing history.</p>

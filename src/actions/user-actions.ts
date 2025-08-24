@@ -1,42 +1,46 @@
+
 'use server';
 
-import type { Role, User } from '@/lib/types';
+import type { Role } from '@/lib/types';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-// Mock user data store
-const mockUsers: { [key: string]: User } = {};
 
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    // In a mock environment, we can assign roles based on some logic,
-    // or just default to CUSTOMER. For simplicity, we'll check a mock admin UID.
-    if (firebaseUid === 'admin_user_uid_placeholder') {
-        return 'ADMIN';
+    try {
+      const userResult = await db.select({ role: users.role }).from(users).where(eq(users.id, firebaseUid)).limit(1);
+      if (userResult.length === 0) {
+        return 'CUSTOMER';
+      }
+      return userResult[0].role as Role;
+    } catch (error) {
+       console.error("Failed to get user role:", error);
+       return 'CUSTOMER';
     }
-    // You could also check an email address for a mock admin
-    const user = mockUsers[firebaseUid];
-    if (user && user.email === 'admin@example.com') {
-      return 'ADMIN';
-    }
-    return user?.role || 'CUSTOMER';
 }
 
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
    if (!data.email) {
      throw new Error("Email is required to create a user.");
    }
-   if (mockUsers[data.firebaseUid]) {
-       // User already exists, do nothing
-       return;
+   
+   try {
+    const existingUser = await db.select().from(users).where(eq(users.id, data.firebaseUid)).limit(1);
+    if (existingUser.length > 0) {
+      return;
+    }
+
+    const role = data.email === 'admin@example.com' ? 'ADMIN' : 'CUSTOMER';
+
+    await db.insert(users).values({
+      id: data.firebaseUid,
+      email: data.email,
+      name: data.name,
+      role: role,
+    });
+   } catch(error) {
+      console.error("Failed to create user in DB:", error);
+      // Decide if you want to throw the error or handle it gracefully
    }
-   
-   // In a real app, you might have specific logic to determine the role.
-   // For now, we'll make a specific email an admin for testing purposes.
-   const role = data.email === 'admin@example.com' ? 'ADMIN' : 'CUSTOMER';
-   
-   mockUsers[data.firebaseUid] = {
-       id: data.firebaseUid,
-       email: data.email,
-       name: data.name,
-       role: role,
-   };
-   console.log('Mock user created:', mockUsers[data.firebaseUid]);
 }

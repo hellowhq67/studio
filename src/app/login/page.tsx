@@ -89,7 +89,7 @@ export default function LoginPage() {
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
       <Card className="w-full max-w-md bg-transparent border-0 shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-4xl mb-2 text-primary">EVANIEGLOW</CardTitle>
+          <CardTitle className="font-headline text-4xl mb-2 text-primary">EVANIE GLOW</CardTitle>
           <CardDescription className="text-muted-foreground">Welcome back! Please enter your details.</CardDescription>
         </CardHeader>
         <Form {...form}>

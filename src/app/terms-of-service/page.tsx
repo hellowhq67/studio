@@ -20,10 +20,10 @@ export default function TermsOfServicePage() {
           <p>When you create an account with us, you must provide us with information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our service.</p>
 
           <h2>4. Intellectual Property</h2>
-          <p>The Service and its original content, features, and functionality are and will remain the exclusive property of EVANIEGLOW and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of EVANIEGLOW.</p>
+          <p>The Service and its original content, features, and functionality are and will remain the exclusive property of Evanie Glow and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Evanie Glow.</p>
 
           <h2>5. Limitation of Liability</h2>
-          <p>In no event shall EVANIEGLOW, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+          <p>In no event shall Evanie Glow, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
 
           <h2>6. Governing Law</h2>
           <p>These Terms shall be governed and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions.</p>

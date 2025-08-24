@@ -30,8 +30,8 @@ const navLinks = [
 
 const Logo = () => (
     <Link href="/" className="flex items-center gap-2">
-       <span className="text-3xl font-extrabold tracking-tight text-primary">EVQ</span>
-       <span className="font-semibold text-xl text-foreground">EVANIEGLOW</span>
+       <span className="text-3xl font-extrabold tracking-tight text-primary">Evanie</span>
+       <span className="font-semibold text-xl text-foreground">Glow</span>
     </Link>
 )
 

@@ -27,7 +27,7 @@ export default function RefundPolicyPage() {
           <p>To initiate a refund, please contact our customer service team at support@evanieglow.com with your order number and a reason for the return. We will provide you with instructions on how to send back the returned products.</p>
 
           <h2>4. Shipping Charges</h2>
-          <p>Shipping charges incurred in connection with the return of a product are non-refundable. You are responsible for paying the costs of shipping and for the risk of loss of or damage to the product during shipping, both to and from EVANIEGLOW.</p>
+          <p>Shipping charges incurred in connection with the return of a product are non-refundable. You are responsible for paying the costs of shipping and for the risk of loss of or damage to the product during shipping, both to and from Evanie Glow.</p>
 
           <h2>5. Damaged Items</h2>
           <p>If you received a damaged product, please notify us immediately for assistance. We will work with you to resolve the issue as quickly as possible.</p>
