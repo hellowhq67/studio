@@ -1,31 +1,35 @@
 
 'use server';
 
-import type { Order, OrderItemInput } from '@/lib/types';
+import type { Order, OrderItemInput, Product, User } from '@/lib/types';
+import { orders as mockOrders, products as mockProducts } from '@/lib/mock-data';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/index';
-import { orders, orderItems, users as usersSchema, products as productsSchema } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
-// This function needs to be adapted based on how you want to handle product/user details.
-// For now, it's a simplified version. A real app might need joins.
-async function enrichOrder(order: any): Promise<any> {
-    const orderItemsResult = await db.select({
-      quantity: orderItems.quantity,
-      price: orderItems.price,
-      product: productsSchema
-    })
-    .from(orderItems)
-    .leftJoin(productsSchema, eq(orderItems.productId, productsSchema.id))
-    .where(eq(orderItems.orderId, order.id));
-    
-    const userResult = await db.select().from(usersSchema).where(eq(usersSchema.id, order.userId)).limit(1);
+let orders: Order[] = [...mockOrders];
+
+async function enrichOrder(order: Order): Promise<any> {
+    const enrichedItems = order.items.map(item => {
+        const product = mockProducts.find(p => p.id === item.productId);
+        return {
+            ...item,
+            product: product || { name: 'Unknown Product' }
+        };
+    });
+
+    // In a mock scenario, we don't have a real user database.
+    // We'll just return a mock user object.
+    const user: User = {
+        id: order.userId,
+        name: 'Mock User',
+        email: 'mock@example.com',
+        role: 'CUSTOMER'
+    };
 
     return {
         ...order,
-        items: orderItemsResult.map(oi => ({...oi, product: oi.product || { name: 'Unknown Product' }})),
-        user: userResult[0] || { name: 'Unknown User' },
-        date: order.createdAt, // for compatibility with existing components
+        items: enrichedItems,
+        user: user,
+        date: order.createdAt,
     };
 }
 
@@ -39,33 +43,30 @@ export async function createOrder(
   status: 'Processing' | 'Paid' | 'Failed' = 'Processing'
 ): Promise<Order | null> {
   try {
-     const newOrder = await db.transaction(async (tx) => {
-        const [insertedOrder] = await tx.insert(orders).values({
-            userId: firebaseUid,
-            total: total.toString(),
-            status,
-            shippingAddress,
-            transactionId,
-        }).returning();
-
-        const itemsToInsert = items.map(item => ({
-            orderId: insertedOrder.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price.toString(),
-        }));
-
-        if (itemsToInsert.length > 0) {
-           await tx.insert(orderItems).values(itemsToInsert);
-        }
-
-        return insertedOrder;
-     });
-
+    const newOrder: Order = {
+      id: `ord_${Math.random().toString(36).substr(2, 9)}`,
+      userId: firebaseUid,
+      items: items.map(item => ({
+          ...item,
+          id: `item_${Math.random().toString(36).substr(2, 9)}`,
+          orderId: '', // will be set later
+          product: {} as Product // Mock product
+      })),
+      total: total,
+      status,
+      shippingAddress: JSON.stringify(shippingAddress),
+      transactionId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      user: {} as User, // Mock user
+    };
+    newOrder.items.forEach(item => item.orderId = newOrder.id);
+    
+    orders.push(newOrder);
 
     revalidatePath('/account');
     
-    return newOrder as Order;
+    return newOrder;
 
   } catch (error) {
     console.error('Error creating order:', error);
@@ -75,7 +76,7 @@ export async function createOrder(
 
 export async function getUserOrders(firebaseUid: string): Promise<any[]> {
     try {
-        const userOrders = await db.select().from(orders).where(eq(orders.userId, firebaseUid));
+        const userOrders = orders.filter(o => o.userId === firebaseUid);
         const enrichedOrders = await Promise.all(userOrders.map(enrichOrder));
         return JSON.parse(JSON.stringify(enrichedOrders));
     } catch (error) {
@@ -86,7 +87,7 @@ export async function getUserOrders(firebaseUid: string): Promise<any[]> {
 
 export async function getAllOrders() {
   try {
-     const allOrders = await db.select().from(orders);
+     const allOrders = [...orders];
      const enrichedOrders = await Promise.all(allOrders.map(enrichOrder));
      return JSON.parse(JSON.stringify(enrichedOrders));
   } catch (error) {

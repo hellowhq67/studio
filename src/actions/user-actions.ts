@@ -2,45 +2,27 @@
 'use server';
 
 import type { Role } from '@/lib/types';
-import { db } from '@/index';
-import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
+const mockUsers: { [key: string]: { role: Role, name: string | null, email: string } } = {
+  'admin@example.com': { role: 'ADMIN', name: 'Admin User', email: 'admin@example.com' },
+};
 
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    try {
-      const userResult = await db.select({ role: users.role }).from(users).where(eq(users.id, firebaseUid)).limit(1);
-      if (userResult.length === 0) {
-        return 'CUSTOMER';
-      }
-      return userResult[0].role as Role;
-    } catch (error) {
-       console.error("Failed to get user role:", error);
-       return 'CUSTOMER';
-    }
+    // In a mock setup, we can't reliably get the user by UID without a DB.
+    // We can use a simple rule for the mock admin.
+    // A real implementation would query the database.
+    return mockUsers['admin@example.com'] ? 'ADMIN' : 'CUSTOMER';
 }
 
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
    if (!data.email) {
-     throw new Error("Email is required to create a user.");
+     console.warn("Attempted to create user without an email.");
+     return;
    }
    
-   try {
-    const existingUser = await db.select().from(users).where(eq(users.id, data.firebaseUid)).limit(1);
-    if (existingUser.length > 0) {
-      return;
-    }
-
-    const role = data.email === 'admin@example.com' ? 'ADMIN' : 'CUSTOMER';
-
-    await db.insert(users).values({
-      id: data.firebaseUid,
-      email: data.email,
-      name: data.name,
-      role: role,
-    });
-   } catch(error) {
-      console.error("Failed to create user in DB:", error);
-      // Decide if you want to throw the error or handle it gracefully
+   // In a mock setup, we don't persist users. This function can be a no-op.
+   console.log("Mock: Creating user in DB", data);
+   if (data.email === 'admin@example.com') {
+     mockUsers[data.firebaseUid] = { role: 'ADMIN', name: data.name, email: data.email };
    }
 }

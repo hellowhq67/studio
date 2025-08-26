@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { db } from '@/index';
-import { products } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { products as mockProducts } from '@/lib/mock-data';
+
+let products: Product[] = [...mockProducts];
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -48,13 +48,18 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { images, tags, ...productData } = validatedFields.data;
     
-    const newProduct: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'rating' | 'reviewCount'> & { images: string[], tags: string[]} = {
+    const newProduct: Product = {
         ...productData,
+        id: `prod_${Math.random().toString(36).substr(2, 9)}`,
         images: images.split(',').map(i => i.trim()),
         tags: tags.split(',').map(t => t.trim()),
+        rating: 0,
+        reviewCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     }
 
-    await db.insert(products).values(newProduct);
+    products.push(newProduct);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -67,24 +72,12 @@ export async function addProduct(prevState: any, formData: FormData) {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  try {
-    const allProducts = await db.select().from(products);
-    // The schema defines non-nullable fields, so we can cast directly
-    // if we trust the database integrity. A safer approach might involve validation.
-    return allProducts as Product[];
-  } catch (error) {
-      console.error("Failed to fetch products:", error);
-      return [];
-  }
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return products;
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    try {
-        const productResult = await db.select().from(products).where(eq(products.id, id)).limit(1);
-        if (productResult.length === 0) return null;
-        return productResult[0] as Product;
-    } catch(error) {
-        console.error(`Failed to fetch product ${id}:`, error);
-        return null;
-    }
+    const product = products.find(p => p.id === id);
+    return product || null;
 }
