@@ -5,9 +5,8 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
-import { products as mockProducts } from '@/lib/mock-data';
-
-let products: Product[] = [...mockProducts];
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, doc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -15,7 +14,7 @@ const ProductSchema = z.object({
   longDescription: z.string().min(20, "Long description is too short"),
   tags: z.string().min(1, 'Please add at least one tag'),
   price: z.coerce.number().positive('Price must be positive'),
-  salePrice: z.coerce.number().optional(),
+  salePrice: z.coerce.number().optional().nullable(),
   quantity: z.coerce.number().int().min(0, 'Quantity cannot be negative').optional(),
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
@@ -30,7 +29,7 @@ export async function addProduct(prevState: any, formData: FormData) {
     longDescription: formData.get('longDescription'),
     tags: formData.get('tags'),
     price: formData.get('price'),
-    salePrice: formData.get('salePrice'),
+    salePrice: formData.get('salePrice') || null,
     quantity: formData.get('quantity'),
     deliveryTime: formData.get('deliveryTime'),
     category: formData.get('category'),
@@ -48,18 +47,18 @@ export async function addProduct(prevState: any, formData: FormData) {
   try {
     const { images, tags, ...productData } = validatedFields.data;
     
-    const newProduct: Product = {
+    const newProductData = {
         ...productData,
-        id: `prod_${Math.random().toString(36).substr(2, 9)}`,
         images: images.split(',').map(i => i.trim()),
         tags: tags.split(',').map(t => t.trim()),
         rating: 0,
         reviewCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
-
-    products.push(newProduct);
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    };
+    
+    const productsCollection = collection(db, 'products');
+    await addDoc(productsCollection, newProductData);
 
   } catch (error) {
     console.error('Error adding product:', error);
@@ -72,12 +71,44 @@ export async function addProduct(prevState: any, formData: FormData) {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return products;
+  try {
+    const productsCollection = collection(db, 'products');
+    const productSnapshot = await getDocs(productsCollection);
+    const productsList = productSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+            updatedAt: data.updatedAt?.toDate().toISOString() || new Date().toISOString(),
+        } as Product;
+    });
+    return productsList;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-    const product = products.find(p => p.id === id);
-    return product || null;
+    try {
+        const productRef = doc(db, 'products', id);
+        const productSnap = await getDoc(productRef);
+
+        if (productSnap.exists()) {
+            const data = productSnap.data();
+            return {
+                id: productSnap.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+                updatedAt: data.updatedAt?.toDate().toISOString() || new Date().toISOString(),
+            } as Product;
+        } else {
+            console.log("No such document!");
+            return null;
+        }
+    } catch(error) {
+        console.error("Error fetching product by ID:", error);
+        return null;
+    }
 }

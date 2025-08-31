@@ -1,3 +1,6 @@
+
+import type { Timestamp } from "firebase/firestore";
+
 export type Category = 'Skincare' | 'Makeup' | 'Haircare' | 'Fragrance';
 export type Role = 'ADMIN' | 'CUSTOMER';
 
@@ -17,8 +20,8 @@ export interface Product {
   quantity?: number | null;
   deliveryTime: string;
   brand: string;
-  createdAt: string; // Changed from Date
-  updatedAt: string; // Changed from Date
+  createdAt: string | Timestamp; 
+  updatedAt: string | Timestamp;
 }
 
 export interface CartItem {
@@ -43,8 +46,8 @@ export interface Order {
   status: string;
   shippingAddress: string;
   transactionId?: string | null;
-  createdAt: string; // Changed from Date
-  updatedAt: string; // Changed from Date
+  createdAt: string | Timestamp;
+  updatedAt: string | Timestamp;
   user: User;
 }
 

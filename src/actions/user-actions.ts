@@ -2,27 +2,49 @@
 'use server';
 
 import type { Role } from '@/lib/types';
-
-const mockUsers: { [key: string]: { role: Role, name: string | null, email: string } } = {
-  'admin@example.com': { role: 'ADMIN', name: 'Admin User', email: 'admin@example.com' },
-};
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from "firebase/firestore"; 
 
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    // In a mock setup, we can't reliably get the user by UID without a DB.
-    // We can use a simple rule for the mock admin.
-    // A real implementation would query the database.
-    return mockUsers['admin@example.com'] ? 'ADMIN' : 'CUSTOMER';
+    try {
+        const userRef = doc(db, "users", firebaseUid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            return userSnap.data().role || 'CUSTOMER';
+        } else {
+            // Default to CUSTOMER if no user document exists
+            return 'CUSTOMER';
+        }
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        return 'CUSTOMER'; // Default role on error
+    }
 }
 
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
-   if (!data.email) {
-     console.warn("Attempted to create user without an email.");
+   if (!data.email || !data.firebaseUid) {
+     console.warn("Attempted to create user with missing email or UID.");
      return;
    }
    
-   // In a mock setup, we don't persist users. This function can be a no-op.
-   console.log("Mock: Creating user in DB", data);
-   if (data.email === 'admin@example.com') {
-     mockUsers[data.firebaseUid] = { role: 'ADMIN', name: data.name, email: data.email };
+   try {
+        const userRef = doc(db, "users", data.firebaseUid);
+        const userSnap = await getDoc(userRef);
+
+        // Only create document if it doesn't already exist
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: data.email,
+                name: data.name,
+                role: data.email === 'admin@example.com' ? 'ADMIN' : 'CUSTOMER', // Assign ADMIN role based on email
+            });
+            console.log("User created in Firestore:", data.firebaseUid);
+        } else {
+            console.log("User already exists in Firestore:", data.firebaseUid);
+        }
+
+   } catch(error) {
+     console.error("Error creating user in Firestore:", error);
    }
 }
