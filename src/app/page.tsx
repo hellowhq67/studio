@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ArrowRight, Star, Heart, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
+import PopupBanner from '@/components/home/PopupBanner';
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
     <div className="text-center group">
@@ -22,6 +23,7 @@ export default async function Home() {
 
   return (
     <div className="bg-background">
+      <PopupBanner />
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 gap-8 items-center">
