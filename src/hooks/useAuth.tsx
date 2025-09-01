@@ -114,7 +114,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     logout,
   }), [user, loading, signup, login, signInWithGoogle, logout]);
   
-  if (loading && !user) {
+  if (loading) {
      return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
