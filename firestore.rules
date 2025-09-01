@@ -1,0 +1,29 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read access to products, but only authenticated users can write.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Users can only read and write their own document.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Users can create and read their own orders. Admins can view all orders.
+    match /orders/{orderId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (request.resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN');
+      allow list: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+    
+    // Order items can be created and read as part of an order.
+    match /orders/{orderId}/items/{itemId} {
+       allow create: if request.auth != null && get(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid;
+       allow read: if request.auth != null && get(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid;
+    }
+  }
+}
