@@ -40,15 +40,15 @@ export default async function Home() {
           </div>
           <div className="relative flex items-center justify-center gap-4">
             <div className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
-                 <img src="https://placehold.co/300x400.png" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
+                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/b454181f-71b3-43a1-b461-155e714f3b55.jpeg" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
             </div>
             <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
-                 <img src="https://placehold.co/400x600.png" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
+                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
             </div>
              <div className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
                 <p className="font-bold">Luxurious Beauty Product</p>
                  <div className="w-full h-24 my-2 rounded-md overflow-hidden">
-                    <img src="https://placehold.co/200x200.png" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
+                    <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/4915089c-3642-4265-af34-4a43b2933939.jpeg" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
                 </div>
                 <div className="flex justify-between items-center">
                     <div>
@@ -76,10 +76,10 @@ export default async function Home() {
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <CategoryCard img="https://placehold.co/200x200.png" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://placehold.co/200x200.png" title="Face Cream" dataAiHint="face cream product" />
-                <CategoryCard img="https://placehold.co/200x200.png" title="Skin Care" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://placehold.co/200x200.png" title="Body Spray" dataAiHint="perfume bottle" />
+                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/7f654f58-5484-486a-9f5b-17c469f6e1f0.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
+                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dkc.jpeg" title="Face Cream" dataAiHint="face cream product" />
+                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
+                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/9156ac1a-7613-4b69-8e43-181156641b6c.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
               </div>
           </div>
       </section>
@@ -110,7 +110,7 @@ export default async function Home() {
               <Button>Shop Now</Button>
             </div>
             <div className="flex-1">
-                <img src="https://placehold.co/300x300.png" alt="Flawless Finish Powder" className="w-full object-contain" data-ai-hint="cosmetic powder jar" />
+                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/9082f42a-97a3-4339-8f55-154d8995a639.jpeg" alt="Flawless Finish Powder" className="w-full object-contain" data-ai-hint="cosmetic powder jar" />
             </div>
           </div>
           <div className="grid gap-8">
@@ -119,14 +119,14 @@ export default async function Home() {
                   <h4 className="text-2xl font-bold">Stripes Are Back!</h4>
                   <p className="text-muted-foreground">Why Stripes is the best!</p>
                 </div>
-                <img src="https://placehold.co/150x150.png" alt="Stripes" className="w-28 h-28 object-contain" data-ai-hint="beauty cream jar" />
+                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/e8c8949c-939e-4e43-982e-6ea10c43666b.jpeg" alt="Stripes" className="w-28 h-28 object-contain" data-ai-hint="beauty cream jar" />
               </div>
               <div className="bg-card p-6 rounded-lg flex items-center justify-between">
                  <div>
                   <h4 className="text-2xl font-bold">Body Lotion</h4>
                   <p className="text-muted-foreground">Check Now</p>
                 </div>
-                <img src="https://placehold.co/150x150.png" alt="Body Lotion" className="w-28 h-28 object-contain" data-ai-hint="applying body lotion" />
+                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dkc.jpeg" alt="Body Lotion" className="w-28 h-28 object-contain" data-ai-hint="applying body lotion" />
               </div>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
-            <img src="https://placehold.co/1200x400.png" alt="Makeup products" className="w-full h-full object-cover" data-ai-hint="makeup products flatlay" />
+            <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/b9800e2b-2357-410a-ae42-95a2b8510c4d.jpeg" alt="Makeup products" className="w-full h-full object-cover" data-ai-hint="makeup products flatlay" />
             <div className="absolute inset-0 bg-black/30 flex flex-col justify-center items-start p-12">
                <h2 className="text-4xl font-bold text-white max-w-md">Highly Performing Beauty Formula</h2>
                <p className="text-white/80 my-4 max-w-md">Discover our new cosmetics, we believe in the power of nature to reveal your natural beauty.</p>
@@ -158,7 +158,7 @@ export default async function Home() {
                     <p className="text-lg text-muted-foreground mb-6">"This is the best beauty product I've ever used. My skin feels amazing and looks so radiant. I highly recommend it to everyone!"</p>
                     <div className="flex justify-center items-center gap-4">
                         <Avatar>
-                            <AvatarImage src="https://placehold.co/100x100.png" alt="Jenny Wilson" data-ai-hint="woman smiling"/>
+                            <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/4915089c-3642-4265-af34-4a43b2933939.jpeg" alt="Jenny Wilson" data-ai-hint="woman smiling"/>
                             <AvatarFallback>JW</AvatarFallback>
                         </Avatar>
                         <div>
@@ -181,7 +181,7 @@ export default async function Home() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {[1, 2, 3, 4].map(i => (
                         <div key={i} className="bg-card rounded-lg overflow-hidden shadow-sm">
-                            <img src={`https://placehold.co/400x300.png`} alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
+                            <img src={`https://storage.googleapis.com/gemini-studio-assets/project-images/172e2938-7557-416b-9c99-382d5a35ba16.jpeg`} alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
                             <div className="p-6">
                                 <p className="text-sm text-muted-foreground mb-2">Dec 22, 2022 - By Admin</p>
                                 <h3 className="font-bold text-lg mb-4">Including Animation in Your Design System</h3>

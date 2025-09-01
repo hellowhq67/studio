@@ -57,9 +57,9 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Evanie Glow. All Rights Reserved.
           </p>
            <div className="flex items-center gap-4 mt-4 md:mt-0">
-             <img src="https://placehold.co/50x30/ffffff/000000?text=Visa" alt="Visa" />
-             <img src="https://placehold.co/50x30/ffffff/000000?text=MC" alt="Mastercard" />
-             <img src="https://placehold.co/50x30/ffffff/000000?text=Amex" alt="American Express" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/Visa.svg" alt="Visa" className="h-8" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/Mastercard.svg" alt="Mastercard" className="h-8" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/AmericanExpress.svg" alt="American Express" className="h-8" />
            </div>
         </div>
       </div>
