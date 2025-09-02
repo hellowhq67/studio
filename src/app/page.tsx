@@ -1,3 +1,4 @@
+
 import { getProducts } from '@/actions/product-actions';
 import ProductGrid from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/button';
