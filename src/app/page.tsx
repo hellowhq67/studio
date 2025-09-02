@@ -96,8 +96,8 @@ export default async function Home() {
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <CategoryCard img="" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dkc.jpeg" title="Face Cream" dataAiHint="face cream product" />
+                <CategoryCard img="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/1756851677967.png" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
+                <CategoryCard img="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/1756851723167.png" title="Face Cream" dataAiHint="face cream product" />
                 <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
                 <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/9156ac1a-7613-4b69-8e43-181156641b6c.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
               </div>
