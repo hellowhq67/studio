@@ -40,7 +40,7 @@ export default async function Home() {
           </div>
           <div className="relative flex items-center justify-center gap-4">
             <div className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
-                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/b454181f-71b3-43a1-b461-155e714f3b55.jpeg" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
+                 <img src="" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
             </div>
             <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
                  <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
