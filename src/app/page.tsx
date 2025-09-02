@@ -18,6 +18,25 @@ const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, 
     </div>
 )
 
+const heroContent = {
+  mainImage: {
+    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg",
+    alt: "A radiant model showcasing Evanie Glow cosmetics",
+    "data-ai-hint": "beauty model face"
+  },
+  sideImage: {
+    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-043910.png",
+    alt: "A portrait of a model with elegant makeup",
+    "data-ai-hint": "beauty model portrait"
+  },
+  productCard: {
+    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png",
+    alt: "A luxurious cosmetic product bottle from Evanie Glow",
+    "data-ai-hint": "cosmetic product bottle"
+  }
+};
+
+
 export default async function Home() {
   const allProducts = await getProducts();
   const beautyCareProducts = allProducts.slice(0, 8);
@@ -41,15 +60,15 @@ export default async function Home() {
           </div>
           <div className="relative flex items-center justify-center gap-4">
             <div className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
-                 <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
+                 <img src={heroContent.sideImage.src} alt={heroContent.sideImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.sideImage['data-ai-hint']} />
             </div>
             <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
-                 <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
+                 <img src={heroContent.mainImage.src} alt={heroContent.mainImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.mainImage['data-ai-hint']} />
             </div>
              <div className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
                 <p className="font-bold">Luxurious Beauty Product</p>
                  <div className="w-full h-24 my-2 rounded-md overflow-hidden">
-                    <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
+                    <img src={heroContent.productCard.src} alt={heroContent.productCard.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.productCard['data-ai-hint']}/>
                 </div>
                 <div className="flex justify-between items-center">
                     <div>
@@ -77,7 +96,7 @@ export default async function Home() {
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/7f654f58-5484-486a-9f5b-17c469f6e1f0.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
+                <CategoryCard img="" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
                 <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dkc.jpeg" title="Face Cream" dataAiHint="face cream product" />
                 <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
                 <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/9156ac1a-7613-4b69-8e43-181156641b6c.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
