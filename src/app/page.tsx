@@ -40,15 +40,15 @@ export default async function Home() {
           </div>
           <div className="relative flex items-center justify-center gap-4">
             <div className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
-                 <img src="" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
+                 <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Beauty model" className="w-full h-full object-cover" data-ai-hint="beauty model portrait" />
             </div>
             <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
-                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/a683a48e-6705-4753-9976-47b293c6691e.jpeg" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
+                 <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Beauty model 2" className="w-full h-full object-cover" data-ai-hint="beauty model face" />
             </div>
              <div className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
                 <p className="font-bold">Luxurious Beauty Product</p>
                  <div className="w-full h-24 my-2 rounded-md overflow-hidden">
-                    <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/4915089c-3642-4265-af34-4a43b2933939.jpeg" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
+                    <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg" alt="Luxury product" className="w-full h-full object-cover" data-ai-hint="cosmetic product bottle"/>
                 </div>
                 <div className="flex justify-between items-center">
                     <div>
@@ -110,7 +110,7 @@ export default async function Home() {
               <Button>Shop Now</Button>
             </div>
             <div className="flex-1">
-                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/9082f42a-97a3-4339-8f55-154d8995a639.jpeg" alt="Flawless Finish Powder" className="w-full object-contain" data-ai-hint="cosmetic powder jar" />
+                <img src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-043938.png" alt="Flawless Finish Powder" className="w-full object-contain" data-ai-hint="cosmetic powder jar" />
             </div>
           </div>
           <div className="grid gap-8">
@@ -126,7 +126,7 @@ export default async function Home() {
                   <h4 className="text-2xl font-bold">Body Lotion</h4>
                   <p className="text-muted-foreground">Check Now</p>
                 </div>
-                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dkc.jpeg" alt="Body Lotion" className="w-28 h-28 object-contain" data-ai-hint="applying body lotion" />
+                <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-4-48a31385dkc.jpeg" alt="Body Lotion" className="w-28 h-28 object-contain" data-ai-hint="applying body lotion" />
               </div>
           </div>
         </div>
