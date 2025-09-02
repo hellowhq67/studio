@@ -136,11 +136,16 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
-            <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/b9800e2b-2357-410a-ae42-95a2b8510c4d.jpeg" alt="Makeup products" className="w-full h-full object-cover" data-ai-hint="makeup products flatlay" />
-            <div className="absolute inset-0 bg-black/30 flex flex-col justify-center items-start p-12">
-               <h2 className="text-4xl font-bold text-white max-w-md">Highly Performing Beauty Formula</h2>
-               <p className="text-white/80 my-4 max-w-md">Discover our new cosmetics, we believe in the power of nature to reveal your natural beauty.</p>
-               <Button size="lg">Shop Now</Button>
+            <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/7a421a97-920f-48d6-953e-f14d86b856a1.jpeg" alt="Flash Sale Banner" className="w-full h-full object-cover" data-ai-hint="cosmetic product sale" />
+            <div className="absolute inset-0 bg-black/10 flex flex-col justify-center items-end p-12 text-right">
+               <div className="max-w-md">
+                 <h2 className="text-5xl font-extrabold text-white leading-tight">FLASH<br />SALE!</h2>
+                 <p className="text-2xl font-semibold text-white my-2">UP TO <span className="text-yellow-300">50% OFF</span></p>
+                 <p className="text-white/90 my-4">Experience Radiant Skin with our New Launch. Don't miss out on these amazing deals!</p>
+                 <Button size="lg" asChild>
+                   <Link href="/products">Shop Now</Link>
+                 </Button>
+               </div>
             </div>
           </div>
         </div>
