@@ -51,11 +51,19 @@ export interface Order {
   user: User;
 }
 
+export interface ShippingAddress {
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+}
+
 export interface User {
     id: string;
     email: string | null;
     name: string | null;
     role: Role;
+    shippingAddress: ShippingAddress | null;
 }
 
 export type OrderItemInput = {
