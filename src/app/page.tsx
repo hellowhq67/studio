@@ -8,6 +8,7 @@ import { ArrowRight, Star, Heart, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
 import PopupBanner from '@/components/home/PopupBanner';
+import AiAssistant from '@/components/home/AiAssistant';
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
     <div className="text-center group">
@@ -20,12 +21,12 @@ const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, 
 
 const heroContent = {
   mainImage: {
-    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg",
+    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-043910.png",
     alt: "A radiant model showcasing Evanie Glow cosmetics",
     "data-ai-hint": "beauty model face"
   },
   sideImage: {
-    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-043910.png",
+    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg",
     alt: "A portrait of a model with elegant makeup",
     "data-ai-hint": "beauty model portrait"
   },
@@ -44,6 +45,7 @@ export default async function Home() {
   return (
     <div className="bg-background">
       <PopupBanner />
+      <AiAssistant />
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 gap-8 items-center">
