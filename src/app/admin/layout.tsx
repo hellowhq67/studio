@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import AdminHeader from '@/components/layout/AdminHeader';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -52,12 +53,12 @@ export default function AdminLayout({
 
   return (
     <TooltipProvider>
-      <div className="flex min-h-screen w-full bg-muted/40">
+      <div className="flex min-h-screen w-full flex-col bg-muted/40">
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-          <nav className="flex flex-col items-center gap-4 px-2 py-4">
+          <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
             <Link href="/admin" className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base">
               <span className="font-bold font-headline text-lg">G</span>
-              <span className="sr-only">GlowUp Admin</span>
+              <span className="sr-only">Evanie Glow Admin</span>
             </Link>
             {navItems.map((item) => (
               <Tooltip key={item.href}>
@@ -75,7 +76,8 @@ export default function AdminLayout({
             ))}
           </nav>
         </aside>
-        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
+        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+          <AdminHeader />
           <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             {children}
           </main>
