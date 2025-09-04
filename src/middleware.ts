@@ -4,6 +4,8 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const loginUrl = new URL('/login', request.url);
+  const accountUrl = new URL('/account', request.url);
 
   // Check if the route is an admin route
   if (pathname.startsWith('/admin')) {
@@ -12,16 +14,12 @@ export function middleware(request: NextRequest) {
 
     if (!authToken) {
       // Not authenticated, redirect to login
-      const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
+      return NextResponse.redirect(loginUrl);
     }
     
     if (userRole !== 'ADMIN') {
         // Authenticated but not an admin, redirect to account page
-        const url = request.nextUrl.clone();
-        url.pathname = '/account';
-        return NextResponse.redirect(url);
+        return NextResponse.redirect(accountUrl);
     }
   }
 

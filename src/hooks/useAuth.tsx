@@ -18,6 +18,7 @@ import { Loader2 } from 'lucide-react';
 import type { Role, ShippingAddress } from '@/lib/types';
 import { getUser, createUserInDb } from '@/actions/user-actions';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
@@ -34,10 +35,10 @@ export interface AppUser {
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signup: (email: string, password: string, displayName: string) => Promise<any>;
-  login: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
-  logout: () => Promise<any>;
+  signup: (email: string, password: string, displayName: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
   updateUserDisplayName: (name: string) => Promise<void>;
 }
 
@@ -59,11 +60,12 @@ const clearAuthCookies = () => {
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const fetchUserAndSet = useCallback(async (firebaseUser: FirebaseUser) => {
+  const fetchUserAndSet = useCallback(async (firebaseUser: FirebaseUser): Promise<AppUser | null> => {
       const appUser = await getUser(firebaseUser.uid);
       if (appUser) {
-        const fullUser = {
+        const fullUser: AppUser = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
@@ -73,19 +75,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
         setUser(fullUser);
         setAuthCookies(firebaseUser, fullUser.role);
-      } else {
-        // This case can happen if the DB record creation is delayed
-        const defaultUser = {
-           uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-            role: 'CUSTOMER' as Role, // Default to CUSTOMER and let DB be source of truth
-            shippingAddress: null
-        };
-        setUser(defaultUser);
-        setAuthCookies(firebaseUser, defaultUser.role);
+        return fullUser;
       }
+      return null;
   }, []);
 
 
@@ -103,6 +95,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, [fetchUserAndSet]);
   
+  const handleAuthSuccess = async (firebaseUser: FirebaseUser) => {
+    const appUser = await fetchUserAndSet(firebaseUser);
+    if (appUser?.role === 'ADMIN') {
+        router.push('/admin');
+    } else {
+        router.push('/account');
+    }
+  };
+
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     if (userCredential.user) {
@@ -112,14 +113,16 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: userCredential.user.email,
             name: displayName,
         });
-        await fetchUserAndSet(userCredential.user);
+        await handleAuthSuccess(userCredential.user);
     }
-    return userCredential;
-  }, [fetchUserAndSet]);
+  }, [fetchUserAndSet, router]);
 
   const login = useCallback(async (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  }, []);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    if(userCredential.user) {
+        await handleAuthSuccess(userCredential.user);
+    }
+  }, [fetchUserAndSet, router]);
 
   const signInWithGoogle = useCallback(async () => {
     const userCredential = await signInWithPopup(auth, googleProvider);
@@ -129,10 +132,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: userCredential.user.email,
             name: userCredential.user.displayName,
         });
-       await fetchUserAndSet(userCredential.user);
+       await handleAuthSuccess(userCredential.user);
     }
-    return userCredential;
-  }, [fetchUserAndSet]);
+  }, [fetchUserAndSet, router]);
 
   const updateUserDisplayName = useCallback(async (name: string) => {
     if (auth.currentUser) {
@@ -144,7 +146,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     await signOut(auth);
-    clearAuthCookies();
   }, []);
 
   const value = useMemo(() => ({

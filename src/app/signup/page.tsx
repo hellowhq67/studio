@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -38,10 +39,10 @@ const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function SignupPage() {
-  const { signup, signInWithGoogle, loading } = useAuth();
-  const router = useRouter();
+  const { signup, signInWithGoogle, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -53,16 +54,18 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
+    setFormLoading(true);
     try {
       await signup(data.email, data.password, data.name);
       toast({ title: "Account Created", description: "Welcome to EVANIEGLOW! You have been logged in." });
-      router.push('/account');
+      // Redirect is handled by useAuth hook
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Signup Failed',
         description: error.message || 'An unexpected error occurred.',
       });
+      setFormLoading(false);
     }
   };
 
@@ -71,17 +74,18 @@ export default function SignupPage() {
     try {
       await signInWithGoogle();
       toast({ title: "Account Created", description: "Welcome to EVANIEGLOW!" });
-      router.push('/account');
+      // Redirect is handled by useAuth hook
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Google Sign-Up Failed',
         description: error.message || 'An unexpected error occurred.',
       });
-    } finally {
-        setGoogleLoading(false);
+       setGoogleLoading(false);
     }
   };
+  
+  const isLoading = authLoading || formLoading || googleLoading;
 
 
   return (
@@ -135,17 +139,17 @@ export default function SignupPage() {
               />
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full h-12 text-lg bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" className="w-full h-12 text-lg bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+                {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign Up Now
                  <ArrowRight className="ml-2 h-5 w-5"/>
-              </Button>
+              </button>
                <div className="flex items-center w-full my-2">
                 <Separator className="flex-1 bg-border/50" />
                 <span className="mx-4 text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1 bg-border/50" />
               </div>
-               <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50" onClick={handleGoogleSignIn} disabled={googleLoading}>
+               <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50" onClick={handleGoogleSignIn} disabled={isLoading}>
                 {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5"/>}
                 Sign up with Google
               </Button>
