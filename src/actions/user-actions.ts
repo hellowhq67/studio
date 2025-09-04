@@ -62,7 +62,7 @@ export async function createUserInDb(data: { firebaseUid: string; email: string 
             await setDoc(userRef, {
                 email: data.email,
                 name: data.name,
-                role: 'ADMIN', // Default role for new users
+                role: 'CUSTOMER', // Default role for new users
                 createdAt: serverTimestamp(),
             });
             console.log("User created in Firestore:", data.firebaseUid);

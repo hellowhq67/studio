@@ -17,6 +17,7 @@ import { app } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { Role, ShippingAddress } from '@/lib/types';
 import { getUser, createUserInDb } from '@/actions/user-actions';
+import Cookies from 'js-cookie';
 
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
@@ -42,6 +43,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const setAuthCookies = (user: FirebaseUser, role: Role) => {
+    Cookies.set('user_role', role, { expires: 7, path: '/' });
+    user.getIdToken().then(token => {
+        Cookies.set('auth_token', token, { expires: 7, path: '/' });
+    })
+};
+
+const clearAuthCookies = () => {
+    Cookies.remove('user_role', { path: '/' });
+    Cookies.remove('auth_token', { path: '/' });
+};
+
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,24 +63,28 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUserAndSet = useCallback(async (firebaseUser: FirebaseUser) => {
       const appUser = await getUser(firebaseUser.uid);
       if (appUser) {
-        setUser({
+        const fullUser = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
           role: appUser.role,
           shippingAddress: appUser.shippingAddress || null
-        });
+        };
+        setUser(fullUser);
+        setAuthCookies(firebaseUser, fullUser.role);
       } else {
-        // This case might happen if DB record creation fails after auth creation
-        setUser({
+        // This case can happen if the DB record creation is delayed
+        const defaultUser = {
            uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName,
             photoURL: firebaseUser.photoURL,
-            role: 'CUSTOMER',
+            role: 'CUSTOMER' as Role, // Default to CUSTOMER and let DB be source of truth
             shippingAddress: null
-        });
+        };
+        setUser(defaultUser);
+        setAuthCookies(firebaseUser, defaultUser.role);
       }
   }, []);
 
@@ -77,6 +95,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await fetchUserAndSet(firebaseUser);
       } else {
         setUser(null);
+        clearAuthCookies();
       }
       setLoading(false);
     });
@@ -118,7 +137,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateUserDisplayName = useCallback(async (name: string) => {
     if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName: name });
-        // Refresh user state
         await fetchUserAndSet(auth.currentUser);
     }
   }, [fetchUserAndSet]);
@@ -126,6 +144,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     await signOut(auth);
+    clearAuthCookies();
   }, []);
 
   const value = useMemo(() => ({

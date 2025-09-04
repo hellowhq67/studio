@@ -2,8 +2,6 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Loader2, LayoutDashboard, Package, ShoppingCart, Image as ImageIcon, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -29,20 +27,9 @@ export default function AdminPanel({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push('/login');
-      } else if (user.role !== 'ADMIN') {
-        router.push('/account'); // Redirect non-admins
-      }
-    }
-  }, [user, loading, router]);
-
-  if (loading || !user || user.role !== 'ADMIN') {
+  
+  if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin" />
