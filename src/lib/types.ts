@@ -63,3 +63,13 @@ export type OrderItemInput = {
     quantity: number;
     price: number;
 }
+
+export interface BlogPost {
+  slug: string;
+  title: string;
+  description: string;
+  author: string;
+  date: string;
+  image: string;
+  content: string;
+}
