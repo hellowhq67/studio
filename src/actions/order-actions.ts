@@ -3,7 +3,7 @@
 
 import type { Order, OrderItemInput, Product, User } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, query, where, doc, getDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, getDoc, writeBatch, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 // Helper to fetch product details for enrichment
@@ -27,12 +27,18 @@ async function getUserDetails(userId: string): Promise<User | null> {
         const userRef = doc(db, 'users', userId);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-            return userSnap.data() as User;
+            const userData = userSnap.data();
+            const user = { id: userSnap.id, ...userData } as User;
+            // Ensure timestamp is converted
+            if (user.createdAt && user.createdAt instanceof Timestamp) {
+                user.createdAt = user.createdAt.toDate().toISOString();
+            }
+            return user;
         }
-         return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null };
+         return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null, createdAt: new Date().toISOString() };
     } catch (error) {
         console.error(`Error fetching user ${userId}:`, error);
-        return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null };
+        return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null, createdAt: new Date().toISOString() };
     }
 }
 

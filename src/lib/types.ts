@@ -67,6 +67,7 @@ export interface User {
     name: string | null;
     role: Role;
     shippingAddress: ShippingAddress | null;
+    createdAt?: string | Timestamp;
 }
 
 export type OrderItemInput = {
