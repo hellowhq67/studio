@@ -37,7 +37,7 @@ export async function createUserInDb(data: { firebaseUid: string; email: string 
             await setDoc(userRef, {
                 email: data.email,
                 name: data.name,
-                role: 'ADMIN', // Temporarily assign ADMIN to all new users
+                role: 'CUSTOMER', // Default role for new users
             });
             console.log("User created in Firestore:", data.firebaseUid);
         } else {
