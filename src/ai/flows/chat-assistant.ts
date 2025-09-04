@@ -161,7 +161,7 @@ const chatAssistantFlow = ai.defineFlow(
     const output = llmResponse.output;
 
     if (!output) {
-      return { reply: "I'm sorry, I couldn't generate a response.", products: [] };
+      return { reply: "I'm sorry, I couldn't generate a response. Please try again.", products: [] };
     }
 
     // Ensure products array is always present
