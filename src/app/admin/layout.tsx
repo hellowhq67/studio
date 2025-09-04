@@ -16,15 +16,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased">
-         <AuthProvider>
-            <TooltipProvider>
-              <AdminPanel>{children}</AdminPanel>
-              <Toaster />
-            </TooltipProvider>
-         </AuthProvider>
-      </body>
-    </html>
+      <AuthProvider>
+        <TooltipProvider>
+          <AdminPanel>{children}</AdminPanel>
+          <Toaster />
+        </TooltipProvider>
+      </AuthProvider>
   );
 }

@@ -72,10 +72,10 @@ export default function AdminOrdersPage() {
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.substring(0, 7).toUpperCase()}</TableCell>
                 <TableCell>
-                  <div className="font-medium">{order.user.name}</div>
-                  <div className="hidden text-sm text-muted-foreground md:inline">{order.user.email}</div>
+                  <div className="font-medium">{order.user?.name || 'Unknown User'}</div>
+                  <div className="hidden text-sm text-muted-foreground md:inline">{order.user?.email}</div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell className="hidden md:table-cell">{new Date(order.createdAt as string).toLocaleDateString()}</TableCell>
                 <TableCell className="hidden md:table-cell">
                   <Badge variant={order.status === 'Paid' ? 'default' : 'secondary'}>{order.status}</Badge>
                 </TableCell>

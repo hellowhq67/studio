@@ -108,7 +108,7 @@ export default function AdminDashboardPage() {
                            {recentOrders.map((order) => (
                               <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.id.substring(0, 7).toUpperCase()}</TableCell>
-                                <TableCell>{order.user.name}</TableCell>
+                                <TableCell>{order.user?.name || 'Unknown User'}</TableCell>
                                 <TableCell>{new Date(order.createdAt as string).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     <Badge variant={order.status === 'Paid' ? 'default' : 'secondary'}>{order.status}</Badge>

@@ -22,6 +22,9 @@ export interface Product {
   brand: string;
   createdAt: string | Timestamp; 
   updatedAt: string | Timestamp;
+  specialPrice?: number;
+  couponCode?: string;
+  deliveryCharge?: number;
 }
 
 export interface CartItem {
@@ -48,7 +51,7 @@ export interface Order {
   transactionId?: string | null;
   createdAt: string | Timestamp;
   updatedAt: string | Timestamp;
-  user: User;
+  user?: User;
 }
 
 export interface ShippingAddress {
