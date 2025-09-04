@@ -29,10 +29,10 @@ async function getUserDetails(userId: string): Promise<User | null> {
         if (userSnap.exists()) {
             return userSnap.data() as User;
         }
-         return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER' };
+         return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null };
     } catch (error) {
         console.error(`Error fetching user ${userId}:`, error);
-        return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER' };
+        return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null };
     }
 }
 
