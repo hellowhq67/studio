@@ -1,4 +1,6 @@
 
+'use client';
+
 import { getProducts } from '@/actions/product-actions';
 import ProductGrid from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/button';
@@ -9,6 +11,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
 import PopupBanner from '@/components/home/PopupBanner';
 import AiAssistant from '@/components/home/AiAssistant';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import type { Product } from '@/lib/types';
+
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
     <div className="text-center group">
@@ -38,16 +44,39 @@ const heroContent = {
 };
 
 
-export default async function Home() {
-  const allProducts = await getProducts();
-  const beautyCareProducts = allProducts.slice(0, 8);
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+        const allProducts = await getProducts();
+        setProducts(allProducts.slice(0, 8));
+        setLoading(false);
+    }
+    fetchProducts();
+  }, []);
+
+  const variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <div className="bg-background">
       <PopupBanner />
       <AiAssistant />
       {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <motion.section 
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        initial="hidden"
+        animate="visible"
+        variants={variants}
+      >
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="md:col-start-1">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight mb-4">
@@ -61,13 +90,13 @@ export default async function Home() {
             </Button>
           </div>
           <div className="relative flex items-center justify-center gap-4">
-            <div className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
                  <img src={heroContent.sideImage.src} alt={heroContent.sideImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.sideImage['data-ai-hint']} />
-            </div>
-            <div className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
                  <img src={heroContent.mainImage.src} alt={heroContent.mainImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.mainImage['data-ai-hint']} />
-            </div>
-             <div className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
+            </motion.div>
+             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.6 }} className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
                 <p className="font-bold">Luxurious Beauty Product</p>
                  <div className="w-full h-24 my-2 rounded-md overflow-hidden">
                     <img src={heroContent.productCard.src} alt={heroContent.productCard.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.productCard['data-ai-hint']}/>
@@ -85,13 +114,19 @@ export default async function Home() {
                     </div>
                     <Button size="sm">Buy Now</Button>
                 </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
       
       {/* Popular Categories */}
-      <section className="py-16 bg-card">
+      <motion.section 
+        className="py-16 bg-card"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={variants}
+      >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
@@ -106,26 +141,38 @@ export default async function Home() {
                 <CategoryCard img="https://picsum.photos/160/160" title="Foundation" dataAiHint="foundation bottle" />
               </div>
           </div>
-      </section>
+      </motion.section>
 
       {/* Beauty Care Products */}
-      <section className="py-16">
+      <motion.section 
+        className="py-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={variants}
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Button variant="outline" className="rounded-full pointer-events-none mb-2">Top Brands</Button>
             <h2 className="text-4xl font-bold">Beauty Care Products</h2>
           </div>
-          <ProductGrid products={beautyCareProducts} />
+          <ProductGrid products={products} />
            <div className="text-center mt-12">
                 <Button variant="outline" asChild>
                     <Link href="/products">View All Products</Link>
                 </Button>
            </div>
         </div>
-      </section>
+      </motion.section>
 
        {/* Featured Banners */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <motion.section 
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={variants}
+      >
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="bg-card p-8 rounded-lg flex items-center">
             <div className="flex-1">
@@ -154,10 +201,16 @@ export default async function Home() {
               </div>
           </div>
         </div>
-      </section>
+      </motion.section>
       
        {/* Highly Performing CTA */}
-      <section className="py-16">
+      <motion.section 
+        className="py-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={variants}
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/7a421a97-920f-48d6-953e-f14d86b856a1.jpeg" alt="Flash Sale Banner" className="w-full h-full object-cover" data-ai-hint="cosmetic product sale" />
@@ -173,10 +226,16 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
       
       {/* Testimonials */}
-       <section className="py-16 bg-card">
+       <motion.section 
+          className="py-16 bg-card"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+          variants={variants}
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
@@ -198,10 +257,16 @@ export default async function Home() {
                 </div>
             </div>
           </div>
-       </section>
+       </motion.section>
        
        {/* Blog Section */}
-        <section className="py-16">
+        <motion.section 
+            className="py-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={variants}
+        >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                  <div className="text-center mb-12">
                     <Button variant="outline" className="rounded-full pointer-events-none mb-2">Recent News</Button>
@@ -222,7 +287,7 @@ export default async function Home() {
                     ))}
                 </div>
             </div>
-        </section>
+        </motion.section>
 
     </div>
   );
