@@ -6,13 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Mic, Send, X, Loader2, Volume2 } from 'lucide-react';
+import { Bot, Mic, Send, X, Loader2, MessageSquareHeart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { chatAssistant, textToSpeech } from '@/ai/flows/chat-assistant';
+import type { Product } from '@/lib/types';
+import ProductCard from '../products/ProductCard';
 
 type Message = {
   role: 'user' | 'assistant';
   text: string;
+  products?: Product[];
 };
 
 export default function AiAssistant() {
@@ -89,7 +92,11 @@ export default function AiAssistant() {
     try {
       const response = await chatAssistant({ query: text });
       
-      const assistantMessage: Message = { role: 'assistant', text: response.reply };
+      const assistantMessage: Message = { 
+        role: 'assistant', 
+        text: response.reply,
+        products: response.products as Product[] || [],
+      };
       setMessages(prev => [...prev, assistantMessage]);
 
       const ttsResponse = await textToSpeech(response.reply);
@@ -109,8 +116,8 @@ export default function AiAssistant() {
   return (
     <>
       <div className={cn("fixed bottom-4 right-4 z-50 transition-transform duration-300", isOpen ? 'translate-x-[calc(100%+2rem)]' : 'translate-x-0')}>
-        <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full w-16 h-16 shadow-lg">
-          <Bot className="w-8 h-8" />
+        <Button onClick={() => setIsOpen(true)} size="lg" className="rounded-full w-16 h-16 shadow-lg bg-accent hover:bg-accent/90">
+          <MessageSquareHeart className="w-8 h-8" />
         </Button>
       </div>
 
@@ -129,14 +136,23 @@ export default function AiAssistant() {
             <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
               <div className="space-y-4">
                 {messages.map((msg, index) => (
-                  <div key={index} className={cn('flex items-end gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                    {msg.role === 'assistant' && <Bot className="w-6 h-6 text-primary flex-shrink-0" />}
-                    <div className={cn(
-                      'max-w-[80%] p-3 rounded-lg',
-                      msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                    )}>
-                      <p className="text-sm">{msg.text}</p>
-                    </div>
+                  <div key={index} className={cn('flex flex-col gap-2', msg.role === 'user' ? 'items-end' : 'items-start')}>
+                     <div className={cn('flex items-end gap-2 w-full', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                        {msg.role === 'assistant' && <Bot className="w-6 h-6 text-primary flex-shrink-0 self-start" />}
+                        <div className={cn(
+                          'max-w-[80%] p-3 rounded-lg',
+                          msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                        )}>
+                          <p className="text-sm">{msg.text}</p>
+                        </div>
+                     </div>
+                     {msg.role === 'assistant' && msg.products && msg.products.length > 0 && (
+                        <div className="grid grid-cols-1 gap-2 mt-2 w-full pl-8">
+                            {msg.products.slice(0, 2).map(product => ( // Show max 2 products
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                     )}
                   </div>
                 ))}
                 {isLoading && (

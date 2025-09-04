@@ -12,6 +12,48 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import wav from 'wav';
 import { googleAI } from '@genkit-ai/googleai';
+import { getProducts } from '@/actions/product-actions';
+import type { Product } from '@/lib/types';
+
+
+// Tool: Get Products
+const getProductsTool = ai.defineTool(
+    {
+      name: 'getProducts',
+      description: 'Retrieves a list of available products from the store catalog. Use this to answer questions about what products are available.',
+      inputSchema: z.object({
+        query: z.string().describe('A search query to filter products by name, description, category, or brand. Leave empty to get all products.'),
+      }),
+      outputSchema: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        description: z.string(),
+        price: z.number(),
+        salePrice: z.number().nullable().optional(),
+        category: z.string(),
+        brand: z.string(),
+        images: z.array(z.string()),
+      })),
+    },
+    async (input) => {
+        console.log(`Getting products with query: ${input.query}`);
+        const allProducts = await getProducts();
+        const query = input.query.toLowerCase();
+        if (!query) {
+            return allProducts.slice(0, 5).map(p => ({ ...p, salePrice: p.salePrice || null })); // Return first 5 if no query
+        }
+        
+        const filtered = allProducts.filter(p => 
+            p.name.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query) ||
+            p.category.toLowerCase().includes(query) ||
+            p.brand.toLowerCase().includes(query)
+        );
+        
+        return filtered.map(p => ({ ...p, salePrice: p.salePrice || null }));
+    }
+);
+
 
 // Input Schema for the main chat flow
 const ChatAssistantInputSchema = z.object({
@@ -21,9 +63,19 @@ export type ChatAssistantInput = z.infer<typeof ChatAssistantInputSchema>;
 
 // Output Schema for the main chat flow
 const ChatAssistantOutputSchema = z.object({
-  reply: z.string().describe('The assistant\'s response to the user.'),
+  reply: z.string().describe('The assistant\'s text response to the user.'),
+  products: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    price: z.number(),
+    salePrice: z.number().nullable().optional(),
+    category: z.string(),
+    brand: z.string(),
+    images: z.array(z.string()),
+  })).describe('A list of relevant products to display to the user, if any.'),
 });
-export type ChatAssistantOutputSchema = z.infer<typeof ChatAssistantOutputSchema>;
+export type ChatAssistantOutput = z.infer<typeof ChatAssistantOutputSchema>;
 
 // Input schema for TTS flow
 const TextToSpeechInputSchema = z.string();
@@ -39,7 +91,7 @@ export type TextToSpeechOutput = z.infer<typeof TextToSpeechOutputSchema>;
 /**
  * The main chat assistant flow.
  */
-export async function chatAssistant(input: ChatAssistantInput): Promise<ChatAssistantOutputSchema> {
+export async function chatAssistant(input: ChatAssistantInput): Promise<ChatAssistantOutput> {
   return chatAssistantFlow(input);
 }
 
@@ -84,9 +136,14 @@ const chatPrompt = ai.definePrompt({
   name: 'chatAssistantPrompt',
   input: { schema: ChatAssistantInputSchema },
   output: { schema: ChatAssistantOutputSchema },
+  tools: [getProductsTool],
   prompt: `You are a friendly and helpful AI customer service assistant for an e-commerce store called "Evanie Glow".
   Your goal is to assist users with their questions about products, orders, and the website.
   Keep your answers concise and helpful.
+
+  If the user asks about available products, use the getProductsTool to search the store's catalog.
+  When you find products, list them in your reply and also return the product data in the 'products' output field.
+  If a user wants to add an item to their cart or checkout, guide them to use the buttons on the product cards or the main navigation. You cannot perform these actions for them.
 
   User query: {{{query}}}`,
 });
@@ -100,8 +157,19 @@ const chatAssistantFlow = ai.defineFlow(
     outputSchema: ChatAssistantOutputSchema,
   },
   async (input) => {
-    const { output } = await chatPrompt(input);
-    return output!;
+    const llmResponse = await chatPrompt(input);
+    const output = llmResponse.output;
+
+    if (!output) {
+      return { reply: "I'm sorry, I couldn't generate a response.", products: [] };
+    }
+
+    // Ensure products array is always present
+    if (!output.products) {
+      output.products = [];
+    }
+
+    return output;
   }
 );
 
