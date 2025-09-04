@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
 

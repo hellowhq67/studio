@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -20,6 +20,9 @@ const ProductSchema = z.object({
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
   brand: z.string().min(1, 'Brand is required'),
   images: z.string().min(1, 'At least one image URL is required'), 
+  specialPrice: z.coerce.number().optional(),
+  couponCode: z.string().optional(),
+  deliveryCharge: z.coerce.number().min(0, 'Delivery charge cannot be negative'),
 });
 
 export async function addProduct(prevState: any, formData: FormData) {
@@ -35,6 +38,9 @@ export async function addProduct(prevState: any, formData: FormData) {
     category: formData.get('category'),
     brand: formData.get('brand'),
     images: formData.get('images'),
+    specialPrice: formData.get('specialPrice') || null,
+    couponCode: formData.get('couponCode') || '',
+    deliveryCharge: formData.get('deliveryCharge') || 0,
   });
 
   if (!validatedFields.success) {
