@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import AdminPanel from './AdminPanel';
-import { AuthProvider } from '@/hooks/useAuth'; // Required for auth checks in AdminPanel
+import { AuthProvider } from '@/hooks/useAuth';
+import '../globals.css';
+
 
 export const metadata: Metadata = {
   title: 'Evanie Glow Admin',
@@ -16,11 +18,15 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-      <AuthProvider>
-        <TooltipProvider>
-          <AdminPanel>{children}</AdminPanel>
-          <Toaster />
-        </TooltipProvider>
-      </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+        <body>
+            <AuthProvider>
+                <TooltipProvider>
+                <AdminPanel>{children}</AdminPanel>
+                <Toaster />
+                </TooltipProvider>
+            </AuthProvider>
+        </body>
+    </html>
   );
 }
