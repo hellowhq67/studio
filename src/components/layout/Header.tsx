@@ -1,9 +1,10 @@
+
 'use client';
 
 import Link from 'next/link';
 import { ShoppingBag, User, Menu, Search, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
 import CartSheetContent from '@/components/cart/CartSheetContent';
 import { useAuth } from '@/hooks/useAuth';
@@ -72,6 +73,9 @@ export default function Header() {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left">
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                </SheetHeader>
                 <Logo />
                 <nav className="flex flex-col space-y-4 mt-8">
                     {navLinks.map((link) => (
