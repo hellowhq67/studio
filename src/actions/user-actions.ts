@@ -3,7 +3,7 @@
 
 import type { Role, User, ShippingAddress } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore"; 
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs } from "firebase/firestore"; 
 import { revalidatePath } from 'next/cache';
 
 export async function getUser(firebaseUid: string): Promise<User | null> {
@@ -62,7 +62,7 @@ export async function createUserInDb(data: { firebaseUid: string; email: string 
             await setDoc(userRef, {
                 email: data.email,
                 name: data.name,
-                role: 'CUSTOMER', // Default role for new users
+                role: 'ADMIN', // Default role for new users
                 createdAt: serverTimestamp(),
             });
             console.log("User created in Firestore:", data.firebaseUid);
@@ -91,5 +91,16 @@ export async function updateUserProfile(firebaseUid: string, data: { name: strin
         console.error('Error updating user profile:', error);
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         return { success: false, message: `Database Error: ${errorMessage}` };
+    }
+}
+
+export async function getAllUsers(): Promise<User[]> {
+    try {
+        const usersCollection = collection(db, 'users');
+        const userSnapshot = await getDocs(usersCollection);
+        return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        return [];
     }
 }
