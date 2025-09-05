@@ -133,12 +133,12 @@ export default function Home() {
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
-                <CategoryCard img="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/1756851677967.png" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/1756851723167.png" title="Face Cream" dataAiHint="face cream product" />
-                <CategoryCard img="https://picsum.photos/160/160" title="Skin Care" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://picsum.photos/160/160" title="Body Spray" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://picsum.photos/160/160" title="Lipstick" dataAiHint="lipstick swatch" />
-                <CategoryCard img="https://picsum.photos/160/160" title="Foundation" dataAiHint="foundation bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Face Cream" dataAiHint="face cream product" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Lipstick" dataAiHint="lipstick swatch" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Foundation" dataAiHint="foundation bottle" />
               </div>
           </div>
       </motion.section>
