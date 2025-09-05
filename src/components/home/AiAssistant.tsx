@@ -148,11 +148,13 @@ export default function AiAssistant() {
       };
 
       // Check if a product was added to the cart by the assistant
-      if ((response as any)?.toolCalls?.some((c: any) => c.tool === 'addToCart')) {
-        const productCall = (response as any).toolCalls.find((c: any) => c.tool === 'addToCart');
-        const product = await getProducts().then(prods => prods.find(p => p.id === productCall.args.productId));
-        if (product) {
-            addItem(product, productCall.args.quantity);
+      if (response.products && response.products.length > 0) {
+        // This is a simplified check. A more robust implementation might check
+        // for a specific tool call confirmation in the response.
+        const addedProduct = response.products.find(p => response.reply.toLowerCase().includes(p.name.toLowerCase()) && response.reply.toLowerCase().includes('added to your cart'));
+        if (addedProduct) {
+            const product = await getProducts().then(prods => prods.find(p => p.id === addedProduct.id));
+            if(product) addItem(product, 1);
         }
       }
       
