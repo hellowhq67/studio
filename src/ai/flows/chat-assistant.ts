@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview A conversational AI assistant for the e-commerce site.
+ * @fileOverview A conversational AI sales assistant for the e-commerce site.
  *
  * - chatAssistant - Handles the chat conversation.
  * - textToSpeech - Converts text to audio.
@@ -20,7 +20,7 @@ import type { Product } from '@/lib/types';
 const getProductsTool = ai.defineTool(
     {
       name: 'getProducts',
-      description: 'Retrieves a list of available products from the store catalog. Use this to answer questions about what products are available, what is on sale, or to find products with discounts or free delivery.',
+      description: 'Retrieves a list of available products from the store catalog. Use this to answer questions about what products are available, what is on sale, or to find products with discounts or free delivery. Can also be used to find product collections for skincare.',
       inputSchema: z.object({
         query: z.string().describe('A search query to filter products by name, description, category, or brand. Can also be "sale", "discount", or "free delivery" to find specific deals.'),
       }),
@@ -42,11 +42,15 @@ const getProductsTool = ai.defineTool(
         const query = input.query.toLowerCase();
 
         if (query === 'sale' || query === 'discount') {
-            return allProducts.filter(p => p.salePrice).map(p => ({ ...p, salePrice: p.salePrice || null }));
+            return allProducts.filter(p => p.salePrice && p.salePrice > 0).map(p => ({ ...p, salePrice: p.salePrice || null }));
         }
 
         if (query === 'free delivery') {
             return allProducts.filter(p => p.deliveryCharge === 0).map(p => ({ ...p, salePrice: p.salePrice || null }));
+        }
+        
+        if (query.includes('collection')) {
+             return allProducts.filter(p => p.category.toLowerCase().includes('skincare')).slice(0, 4).map(p => ({ ...p, salePrice: p.salePrice || null }));
         }
 
         if (!query) {
@@ -187,21 +191,23 @@ const chatPrompt = ai.definePrompt({
   input: { schema: ChatAssistantInputSchema },
   output: { schema: ChatAssistantOutputSchema },
   tools: [getProductsTool, addToCartTool, getCheckoutUrlTool],
-  prompt: `You are Eva, a friendly and helpful AI shopping assistant for an e-commerce store called "Evanie Glow".
-  Your goal is to provide a delightful and seamless shopping experience.
-  
-  {{#if userName}}
-  The user you are talking to is named {{userName}}. Greet them by name.
-  {{else}}
-  Greet the user warmly and introduce yourself.
-  {{/if}}
-  
-  - Proactively suggest products, especially those on sale or with special offers like free delivery. Use the getProductsTool for this.
+  prompt: `You are Leo, an expert sales assistant for "Evanie Glow," a premium cosmetics and skincare store. 
+  Your primary goal is to engage customers in a natural, helpful conversation that leads to a sale. You are an expert in skincare and beauty.
+
+  - Greet the user warmly. If you know their name, use it!
+  - Your tone should be confident, knowledgeable, and friendly.
+  - Proactively suggest products, collections, and special deals (sales, free delivery). Use your tools to find this information.
+  - When suggesting products, explain *why* they are a good fit for the user if you have enough context.
+  - If the user asks for a "collection," interpret that as a request for a set of related products, like a skincare routine.
   - When you find products, list them in your reply and also return the product data in the 'products' output field.
   - If a user wants to add an item to their cart, use the addToCartTool. Confirm what was added.
   - If a user asks to checkout or is ready to pay, use the getCheckoutUrlTool and provide the link in your reply. Set the 'checkoutUrl' output field.
   - Use the conversation history to understand the context of the user's request.
 
+  {{#if userName}}
+  The user you are talking to is named {{userName}}.
+  {{/if}}
+  
   User query: {{{query}}}`,
 });
 
@@ -245,7 +251,8 @@ const textToSpeechFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Calytrix' }, // Using a female voice
+            // Using a default male voice
+            prebuiltVoiceConfig: { voiceName: 'Chiron' },
           },
         },
       },
@@ -263,3 +270,5 @@ const textToSpeechFlow = ai.defineFlow(
     };
   }
 );
+
+    

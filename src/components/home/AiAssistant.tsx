@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Mic, Send, X, Loader2, MessageSquareHeart, Sparkles } from 'lucide-react';
+import { Mic, Send, X, Loader2, MessageSquareHeart, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { chatAssistant, textToSpeech } from '@/ai/flows/chat-assistant';
 import type { Product } from '@/lib/types';
@@ -28,9 +28,9 @@ type Message = {
 };
 
 const suggestedPrompts = [
-  "What's on sale?",
-  "Show me some popular skincare products.",
-  "Do you have any products with free delivery?",
+  "What skincare collections do you have?",
+  "Show me some popular products on sale.",
+  "Do you have any items with free delivery?",
   "I'm looking for a gift."
 ];
 
@@ -61,7 +61,7 @@ export default function AiAssistant() {
         const welcomeMessage: Message = {
             id: Date.now(),
             role: 'assistant',
-            text: `Hi ${user?.displayName || ''}, I'm Eva, your friendly shopping assistant! How can I help you today? You can ask me about products, sales, or anything else you need.`,
+            text: `Hi ${user?.displayName || 'there'}, I'm Leo, your expert sales assistant! How can I help you find the perfect product today?`,
         };
         setMessages([welcomeMessage]);
         setIsLoading(false);
@@ -195,10 +195,10 @@ export default function AiAssistant() {
           <CardHeader className="flex flex-row items-center justify-between">
              <CardTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
-                    <AvatarFallback>E</AvatarFallback>
+                    <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/611a73a2-b45e-4402-be25-1e2474813f2b.jpeg" alt="Leo" />
+                    <AvatarFallback>L</AvatarFallback>
                 </Avatar>
-                Eva
+                Leo
             </CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />
@@ -221,15 +221,15 @@ export default function AiAssistant() {
                      <div className={cn('flex items-end gap-2 w-full', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                         {msg.role === 'assistant' && (
                              <Avatar className="h-8 w-8 flex-shrink-0 self-start">
-                                <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
-                                <AvatarFallback>E</AvatarFallback>
+                                <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/611a73a2-b45e-4402-be25-1e2474813f2b.jpeg" alt="Leo" />
+                                <AvatarFallback>L</AvatarFallback>
                             </Avatar>
                         )}
                         <div className={cn(
                           'max-w-[85%] p-3 rounded-lg',
                           msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                         )}>
-                          <p className="text-sm">{msg.text}</p>
+                          <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                            {msg.checkoutUrl && (
                                 <Button asChild size="sm" className="mt-2 w-full">
                                     <Link href={msg.checkoutUrl}>Proceed to Checkout</Link>
@@ -244,8 +244,8 @@ export default function AiAssistant() {
                         )}
                      </div>
                      {msg.role === 'assistant' && msg.products && msg.products.length > 0 && (
-                        <div className="grid grid-cols-1 gap-2 mt-2 w-full pl-8">
-                            {msg.products.slice(0, 2).map(product => (
+                        <div className="grid grid-cols-1 gap-2 mt-2 w-full pl-10">
+                            {msg.products.slice(0, 3).map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
@@ -255,7 +255,7 @@ export default function AiAssistant() {
                 </AnimatePresence>
                  {hasWelcomed && messages.length === 1 && !isLoading && (
                     <motion.div
-                        className="pt-4 pl-8 space-y-2"
+                        className="pt-4 pl-10 space-y-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
@@ -282,11 +282,15 @@ export default function AiAssistant() {
                     animate={{ opacity: 1 }}
                    >
                         <Avatar className="h-8 w-8 flex-shrink-0 self-start">
-                           <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
-                           <AvatarFallback>E</AvatarFallback>
+                           <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/611a73a2-b45e-4402-be25-1e2474813f2b.jpeg" alt="Leo" />
+                           <AvatarFallback>L</AvatarFallback>
                        </Avatar>
                       <div className="bg-muted p-3 rounded-lg">
-                         <Loader2 className="w-5 h-5 animate-spin"/>
+                         <div className="flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse delay-0"></span>
+                            <span className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse delay-150"></span>
+                            <span className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse delay-300"></span>
+                         </div>
                       </div>
                    </motion.div>
                 )}
@@ -297,7 +301,7 @@ export default function AiAssistant() {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask Eva..."
+                  placeholder="Ask Leo..."
                   disabled={isLoading}
                 />
                 <Button type="button" variant={isListening ? "destructive" : "outline"} size="icon" onClick={handleToggleListen} disabled={!recognitionRef.current || isLoading}>
@@ -314,3 +318,5 @@ export default function AiAssistant() {
     </>
   );
 }
+
+    

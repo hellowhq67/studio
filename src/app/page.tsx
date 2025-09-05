@@ -10,7 +10,7 @@ import { ArrowRight, Star, Heart, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
 import PopupBanner from '@/components/home/PopupBanner';
-import AiAssistant from '@/components/home/AiAssistant';
+import AiAssistantLoader from '@/components/home/AiAssistantLoader';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
@@ -86,7 +86,7 @@ export default function Home() {
   return (
     <div className="bg-background overflow-x-hidden">
       <PopupBanner />
-      <AiAssistant />
+      <AiAssistantLoader />
       {/* Hero Section */}
       <motion.section 
         className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
@@ -148,7 +148,7 @@ export default function Home() {
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Makeup" dataAiHint="face cream product" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Haircare" dataAiHint="woman skincare routine" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Fragrance" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Makeup" dataAiHint="lipstick swatch" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Body Spray" dataAiHint="lipstick swatch" />
                 <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
               </div>
           </div>
@@ -301,3 +301,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
