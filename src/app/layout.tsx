@@ -5,14 +5,10 @@ import { CartProvider } from '@/hooks/useCart';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { AuthProvider } from '@/hooks/useAuth';
-import { Inter } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
 import { CurrencyProvider } from '@/hooks/useCurrency';
 import { app } from '@/lib/firebase'; // Ensure firebase is initialized
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-sans' 
-});
 
 export const metadata: Metadata = {
   title: 'Evanie Glow',
@@ -31,7 +27,7 @@ export default function RootLayout({
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
       </head>
-      <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}>
+      <body className={`${GeistSans.variable} font-sans antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
           <CurrencyProvider>
             <CartProvider>

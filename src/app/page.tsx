@@ -137,7 +137,7 @@ export default function Home() {
       </motion.section>
       
       {/* Popular Categories */}
-       <ParallaxSection className="py-16 bg-card">
+       <ParallaxSection className="py-16 bg-card/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
@@ -173,7 +173,7 @@ export default function Home() {
        {/* Featured Banners */}
       <ParallaxSection className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-card p-8 rounded-lg flex items-center">
+          <div className="bg-card/50 p-8 rounded-lg flex items-center">
             <div className="flex-1">
               <h3 className="text-3xl font-bold mb-2">Flawless Finish Powder!</h3>
               <p className="text-muted-foreground mb-4">New product with 10% off</p>
@@ -184,14 +184,14 @@ export default function Home() {
             </div>
           </div>
           <div className="grid gap-8">
-              <div className="bg-card p-6 rounded-lg flex items-center justify-between">
+              <div className="bg-card/50 p-6 rounded-lg flex items-center justify-between">
                 <div>
                   <h4 className="text-2xl font-bold">Stripes Are Back!</h4>
                   <p className="text-muted-foreground">Why Stripes is the best!</p>
                 </div>
                 <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/e8c8949c-939e-4e43-982e-6ea10c43666b.jpeg" alt="Stripes" className="w-28 h-28 object-contain" data-ai-hint="beauty cream jar" />
               </div>
-              <div className="bg-card p-6 rounded-lg flex items-center justify-between">
+              <div className="bg-card/50 p-6 rounded-lg flex items-center justify-between">
                  <div>
                   <h4 className="text-2xl font-bold">Body Lotion</h4>
                   <p className="text-muted-foreground">Check Now</p>
@@ -207,10 +207,10 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/7a421a97-920f-48d6-953e-f14d86b856a1.jpeg" alt="Flash Sale Banner" className="w-full h-full object-cover" data-ai-hint="cosmetic product sale" />
-            <div className="absolute inset-0 bg-black/10 flex flex-col justify-center items-end p-12 text-right">
+            <div className="absolute inset-0 bg-black/50 flex flex-col justify-center items-end p-12 text-right">
                <div className="max-w-md">
                  <h2 className="text-5xl font-extrabold text-white leading-tight">FLASH<br />SALE!</h2>
-                 <p className="text-2xl font-semibold text-white my-2">UP TO <span className="text-yellow-300">50% OFF</span></p>
+                 <p className="text-2xl font-semibold text-white my-2">UP TO <span className="text-accent">50% OFF</span></p>
                  <p className="text-white/90 my-4">Experience Radiant Skin with our New Launch. Don't miss out on these amazing deals!</p>
                  <Button size="lg" asChild>
                    <Link href="/products">Shop Now</Link>
@@ -222,7 +222,7 @@ export default function Home() {
       </ParallaxSection>
       
       {/* Testimonials */}
-       <ParallaxSection className="py-16 bg-card">
+       <ParallaxSection className="py-16 bg-card/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
@@ -254,7 +254,7 @@ export default function Home() {
                     <h2 className="text-4xl font-bold">From The Blog</h2>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-card/50 rounded-lg overflow-hidden shadow-sm">
                         <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/42f9b33a-6b83-42e6-8987-9d41b5258e72.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
                         <div className="p-6">
                             <p className="text-sm text-muted-foreground mb-2">Jul 15, 2024 - By Alexia Glow</p>
@@ -264,7 +264,7 @@ export default function Home() {
                             </Link>
                         </div>
                     </div>
-                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-card/50 rounded-lg overflow-hidden shadow-sm">
                         <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/75949175-1049-4340-8b10-189a05b4a742.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="skincare products" />
                         <div className="p-6">
                             <p className="text-sm text-muted-foreground mb-2">Jul 10, 2024 - By Casey Derma</p>
@@ -274,7 +274,7 @@ export default function Home() {
                             </Link>
                         </div>
                     </div>
-                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-card/50 rounded-lg overflow-hidden shadow-sm">
                         <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/0b45d55b-77c8-4720-a685-613d9697d81a.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="makeup brushes" />
                         <div className="p-6">
                             <p className="text-sm text-muted-foreground mb-2">Jul 05, 2024 - By Jen Brushstroke</p>
@@ -284,7 +284,7 @@ export default function Home() {
                             </Link>
                         </div>
                     </div>
-                     <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                     <div className="bg-card/50 rounded-lg overflow-hidden shadow-sm">
                         <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/9140c838-51bb-455b-8032-4e0d421f2eed.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="summer hair" />
                         <div className="p-6">
                             <p className="text-sm text-muted-foreground mb-2">Jun 28, 2024 - By Serena Strands</p>
@@ -295,11 +295,14 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
+                 <div className="text-center mt-12">
+                     <Button asChild>
+                         <Link href="/blog">More From The Blog</Link>
+                    </Button>
+                </div>
             </div>
         </ParallaxSection>
 
     </div>
   );
 }
-
-    
