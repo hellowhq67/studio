@@ -79,6 +79,7 @@ const testimonials = [
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const autoplayPlugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
 
   useEffect(() => {
     const fetchProductsAndSeed = async () => {
@@ -104,12 +105,10 @@ export default function Home() {
       <PopupBanner />
       <AiAssistantLoader />
        <Carousel 
-        plugins={[
-            Autoplay({
-            delay: 4000,
-            }),
-        ]}
+        plugins={[autoplayPlugin.current]}
         className="w-full"
+        onMouseEnter={autoplayPlugin.current.stop}
+        onMouseLeave={autoplayPlugin.current.reset}
         >
         <CarouselContent>
             <CarouselItem>
@@ -310,3 +309,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
