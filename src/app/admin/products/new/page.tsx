@@ -1,7 +1,8 @@
 
 'use client';
-import { useActionState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useActionState, useState, useRef } from 'react';
+import type { PutBlobResult } from '@vercel/blob';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { addProduct } from '@/actions/product-actions';
@@ -12,6 +13,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2, UploadCloud, X, Image as ImageIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -19,15 +23,15 @@ const ProductSchema = z.object({
   longDescription: z.string().min(20, "Long description is too short"),
   tags: z.string().min(1, 'Please add at least one tag (comma-separated)'),
   price: z.coerce.number().positive('Price must be positive'),
-  salePrice: z.coerce.number().optional(),
-  specialPrice: z.coerce.number().optional(),
+  salePrice: z.coerce.number().optional().nullable(),
+  specialPrice: z.coerce.number().optional().nullable(),
   couponCode: z.string().optional(),
   deliveryCharge: z.coerce.number().min(0, 'Delivery charge cannot be negative'),
   quantity: z.coerce.number().int().min(0, 'Quantity cannot be negative'),
   deliveryTime: z.string().min(1, 'Please provide a delivery estimate'),
   category: z.enum(['Skincare', 'Makeup', 'Haircare', 'Fragrance']),
   brand: z.string().min(1, 'Brand is required'),
-  images: z.string().min(1, 'At least one image URL is required (comma-separated)'),
+  images: z.string().min(1, 'At least one image is required'),
 });
 
 type ProductFormValues = z.infer<typeof ProductSchema>;
@@ -35,9 +39,14 @@ type ProductFormValues = z.infer<typeof ProductSchema>;
 export default function AddProductPage() {
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(addProduct, initialState);
+  const { toast } = useToast();
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(ProductSchema),
-     defaultValues: {
+    defaultValues: {
       name: '',
       description: '',
       longDescription: '',
@@ -55,6 +64,40 @@ export default function AddProductPage() {
     },
   });
 
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setIsUploading(true);
+
+    try {
+        const uploadPromises = Array.from(files).map(async file => {
+             const response = await fetch(`/api/upload?filename=${file.name}`, {
+                method: 'POST',
+                body: file,
+             });
+             if(!response.ok) throw new Error('Upload failed');
+             const newBlob = (await response.json()) as PutBlobResult;
+             return newBlob.url;
+        });
+
+        const urls = await Promise.all(uploadPromises);
+        const newImageUrls = [...imageUrls, ...urls];
+        setImageUrls(newImageUrls);
+        form.setValue('images', newImageUrls.join(','), { shouldValidate: true });
+
+        toast({ title: 'Images uploaded successfully' });
+    } catch(e) {
+        toast({ variant: 'destructive', title: 'Upload Error', description: 'Could not upload images.' });
+    } finally {
+        setIsUploading(false);
+    }
+  };
+  
+  const removeImage = (index: number) => {
+    const newImageUrls = imageUrls.filter((_, i) => i !== index);
+    setImageUrls(newImageUrls);
+    form.setValue('images', newImageUrls.join(','), { shouldValidate: true });
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -68,11 +111,7 @@ export default function AddProductPage() {
               {/* Column 1 */}
               <div className="space-y-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Name</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <FormItem><FormLabel>Product Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
 
                 <FormField control={form.control} name="brand" render={({ field }) => (
@@ -109,19 +148,67 @@ export default function AddProductPage() {
                   <FormItem><FormLabel>Tags (comma-separated)</FormLabel><FormControl><Input {...field} placeholder="e.g. vegan, hydrating, summer" /></FormControl><FormMessage /></FormItem>
                 )} />
 
-                <FormField control={form.control} name="images" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Product Photos (comma-separated URLs)</FormLabel>
-                        <FormControl>
-                            <Input type="text" {...field} placeholder="https://.../img1.png, https://.../img2.png" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
               </div>
 
               {/* Column 2 */}
               <div className="space-y-4">
+                 <FormField
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Product Photos</FormLabel>
+                             <FormControl>
+                                <>
+                                    <Input type="hidden" {...field} />
+                                    <div 
+                                        className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50"
+                                        onClick={() => inputFileRef.current?.click()}
+                                    >
+                                        <input 
+                                            type="file" 
+                                            ref={inputFileRef} 
+                                            multiple 
+                                            accept="image/*"
+                                            className="hidden" 
+                                            onChange={(e) => handleImageUpload(e.target.files)}
+                                            disabled={isUploading}
+                                        />
+                                        {isUploading ? (
+                                            <div className="flex flex-col items-center gap-2">
+                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                <p>Uploading...</p>
+                                            </div>
+                                        ) : (
+                                             <div className="flex flex-col items-center gap-2">
+                                                <UploadCloud className="h-8 w-8 text-muted-foreground"/>
+                                                <p>Click or drag to upload images</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            </FormControl>
+                            <FormMessage />
+                             {imageUrls.length > 0 && (
+                                <div className="grid grid-cols-3 gap-2 mt-2">
+                                    {imageUrls.map((url, index) => (
+                                        <div key={index} className="relative group">
+                                            <img src={url} alt={`upload-preview-${index}`} className="w-full h-24 object-cover rounded-md"/>
+                                            <button 
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                             )}
+                        </FormItem>
+                    )}
+                 />
+
                  <div className="grid grid-cols-2 gap-4">
                     <FormField control={form.control} name="price" render={({ field }) => (
                         <FormItem><FormLabel>Price ($)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
