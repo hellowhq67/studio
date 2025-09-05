@@ -17,6 +17,15 @@ import type { Product } from '@/lib/types';
 import { Spotlight } from '@/components/ui/spotlight';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
 import { BackgroundBeams } from '@/components/ui/background-beams';
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
 
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
@@ -94,23 +103,52 @@ export default function Home() {
     <div className="bg-background overflow-x-hidden">
       <PopupBanner />
       <AiAssistantLoader />
-      {/* Hero Section */}
-      <div className="relative flex h-[40rem] w-full overflow-hidden rounded-md bg-background antialiased md:items-center md:justify-center">
-          <div className="relative z-10 mx-auto w-full max-w-7xl p-4 pt-20 md:pt-0">
-            <h1 className="bg-opacity-50 bg-gradient-to-b from-neutral-50 to-neutral-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
-              Evanie Glow
-            </h1>
-            <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-neutral-300">
-            Discover your inner radiance with our exquisite collection of cosmetics.
-            </p>
-            <div className="flex justify-center mt-8">
-                <Button asChild>
-                    <Link href="/products">Shop Now</Link>
-                </Button>
-            </div>
-          </div>
-          <BackgroundBeams />
-      </div>
+       <Carousel 
+        plugins={[
+            Autoplay({
+            delay: 4000,
+            }),
+        ]}
+        className="w-full"
+        >
+        <CarouselContent>
+            <CarouselItem>
+                <div className="h-[70vh] w-full bg-cover bg-center flex items-center justify-center text-white" style={{backgroundImage: "url('https://storage.googleapis.com/gemini-studio-assets/project-images/c8c50c5a-3c58-47d6-848e-0f0e7d7042f9.jpeg')"}}>
+                     <div className="text-center bg-black/50 p-8 rounded-lg">
+                        <h1 className="text-5xl font-extrabold tracking-tight">Unlock Your Radiance</h1>
+                        <p className="mt-4 text-xl">Discover premium cosmetics that celebrate you.</p>
+                        <Button className="mt-6" asChild>
+                            <Link href="/products">Shop Now</Link>
+                        </Button>
+                    </div>
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                 <div className="h-[70vh] w-full bg-cover bg-center flex items-center justify-center text-white" style={{backgroundImage: "url('https://storage.googleapis.com/gemini-studio-assets/project-images/b4d673f3-a1b6-4e55-89f5-45a76f62364c.jpeg')"}}>
+                    <div className="text-center bg-black/50 p-8 rounded-lg">
+                        <h1 className="text-5xl font-extrabold tracking-tight">Beauty Redefined</h1>
+                        <p className="mt-4 text-xl">High-performance skincare for a flawless glow.</p>
+                         <Button className="mt-6" asChild>
+                            <Link href="/products">Shop Skincare</Link>
+                        </Button>
+                    </div>
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                 <div className="h-[70vh] w-full bg-cover bg-center flex items-center justify-center text-white" style={{backgroundImage: "url('https://storage.googleapis.com/gemini-studio-assets/project-images/0b45d55b-77c8-4720-a685-613d9697d81a.jpeg')"}}>
+                    <div className="text-center bg-black/50 p-8 rounded-lg">
+                        <h1 className="text-5xl font-extrabold tracking-tight">New Arrivals</h1>
+                        <p className="mt-4 text-xl">Explore the latest trends in beauty.</p>
+                         <Button className="mt-6" asChild>
+                            <Link href="/products">Explore New</Link>
+                        </Button>
+                    </div>
+                </div>
+            </CarouselItem>
+        </CarouselContent>
+        <CarouselPrevious className="left-4" />
+        <CarouselNext className="right-4" />
+        </Carousel>
       
       {/* Popular Categories */}
        <section className="py-16 bg-card/50">
@@ -272,5 +310,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
