@@ -20,9 +20,9 @@ import type { Product } from '@/lib/types';
 const getProductsTool = ai.defineTool(
     {
       name: 'getProducts',
-      description: 'Retrieves a list of available products from the store catalog. Use this to answer questions about what products are available.',
+      description: 'Retrieves a list of available products from the store catalog. Use this to answer questions about what products are available, what is on sale, or to find products with discounts or free delivery.',
       inputSchema: z.object({
-        query: z.string().describe('A search query to filter products by name, description, category, or brand. Leave empty to get all products.'),
+        query: z.string().describe('A search query to filter products by name, description, category, or brand. Can also be "sale", "discount", or "free delivery" to find specific deals.'),
       }),
       outputSchema: z.array(z.object({
         id: z.string(),
@@ -39,6 +39,15 @@ const getProductsTool = ai.defineTool(
         console.log(`Getting products with query: ${input.query}`);
         const allProducts = await getProducts();
         const query = input.query.toLowerCase();
+
+        if (query === 'sale' || query === 'discount') {
+            return allProducts.filter(p => p.salePrice).map(p => ({ ...p, salePrice: p.salePrice || null }));
+        }
+
+        if (query === 'free delivery') {
+            return allProducts.filter(p => p.deliveryCharge === 0).map(p => ({ ...p, salePrice: p.salePrice || null }));
+        }
+
         if (!query) {
             return allProducts.slice(0, 5).map(p => ({ ...p, salePrice: p.salePrice || null })); // Return first 5 if no query
         }
@@ -51,6 +60,42 @@ const getProductsTool = ai.defineTool(
         );
         
         return filtered.map(p => ({ ...p, salePrice: p.salePrice || null }));
+    }
+);
+
+// Tool: Add to Cart
+const addToCartTool = ai.defineTool(
+    {
+        name: 'addToCart',
+        description: "Adds a specified quantity of a product to the user's shopping cart. Returns a confirmation message.",
+        inputSchema: z.object({
+            productId: z.string().describe("The ID of the product to add to the cart."),
+            quantity: z.number().int().positive().describe("The number of units to add."),
+        }),
+        outputSchema: z.string(),
+    },
+    async ({ productId, quantity }) => {
+        // This is a placeholder. In a real app, you would have an action `cartActions.ts` 
+        // to interact with the user's cart (e.g., in localStorage or a database).
+        console.log(`AI trying to add ${quantity} of product ${productId} to cart.`);
+        const product = await getProducts().then(products => products.find(p => p.id === productId));
+        if (product) {
+          return `I've added ${quantity} x ${product.name} to your cart.`;
+        }
+        return "I couldn't find that product to add it to your cart.";
+    }
+);
+
+// Tool: Get Checkout URL
+const getCheckoutUrlTool = ai.defineTool(
+    {
+        name: 'getCheckoutUrl',
+        description: "Provides a URL to the checkout page.",
+        inputSchema: z.object({}),
+        outputSchema: z.string(),
+    },
+    async () => {
+        return "/checkout";
     }
 );
 
@@ -73,7 +118,9 @@ const ChatAssistantOutputSchema = z.object({
     category: z.string(),
     brand: z.string(),
     images: z.array(z.string()),
+    deliveryCharge: z.number().optional(),
   })).describe('A list of relevant products to display to the user, if any.'),
+  checkoutUrl: z.string().optional().describe('A URL to the checkout page, if requested.'),
 });
 export type ChatAssistantOutput = z.infer<typeof ChatAssistantOutputSchema>;
 
@@ -136,14 +183,15 @@ const chatPrompt = ai.definePrompt({
   name: 'chatAssistantPrompt',
   input: { schema: ChatAssistantInputSchema },
   output: { schema: ChatAssistantOutputSchema },
-  tools: [getProductsTool],
-  prompt: `You are a friendly and helpful AI customer service assistant for an e-commerce store called "Evanie Glow".
-  Your goal is to assist users with their questions about products, orders, and the website.
-  Keep your answers concise and helpful.
-
-  If the user asks about available products, use the getProductsTool to search the store's catalog.
-  When you find products, list them in your reply and also return the product data in the 'products' output field.
-  If a user wants to add an item to their cart or checkout, guide them to use the buttons on the product cards or the main navigation. You cannot perform these actions for them.
+  tools: [getProductsTool, addToCartTool, getCheckoutUrlTool],
+  prompt: `You are Eva, a friendly and helpful AI shopping assistant for an e-commerce store called "Evanie Glow".
+  Your goal is to provide a delightful and seamless shopping experience.
+  
+  - Greet the user warmly and introduce yourself.
+  - Proactively suggest products, especially those on sale or with special offers like free delivery. Use the getProductsTool for this.
+  - When you find products, list them in your reply and also return the product data in the 'products' output field.
+  - If a user wants to add an item to their cart, use the addToCartTool. Confirm what was added.
+  - If a user asks to checkout or is ready to pay, use the getCheckoutUrlTool and provide the link in your reply. Set the 'checkoutUrl' output field.
 
   User query: {{{query}}}`,
 });
@@ -164,7 +212,7 @@ const chatAssistantFlow = ai.defineFlow(
       return { reply: "I'm sorry, I couldn't generate a response. Please try again.", products: [] };
     }
 
-    // Ensure products array is always present, even if the model hallucinates it as null or undefined.
+    // Ensure products array is always present
     if (!output.products) {
       output.products = [];
     }
