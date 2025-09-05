@@ -14,8 +14,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UploadCloud, X, Image as ImageIcon } from 'lucide-react';
+import { Loader2, UploadCloud, X, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { generateProductContent } from '@/ai/flows/generate-product-content';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -43,6 +44,7 @@ export default function AddProductPage() {
   const inputFileRef = useRef<HTMLInputElement>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(ProductSchema),
@@ -64,12 +66,70 @@ export default function AddProductPage() {
     },
   });
 
-  const handleImageUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    setIsUploading(true);
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+  }
+
+  const handleAiGenerate = async () => {
+    const { name, category } = form.getValues();
+    if (!name || !category) {
+        toast({ variant: 'destructive', title: 'Missing Info', description: 'Please provide a product name and category first.' });
+        return;
+    }
+    if (imageUrls.length === 0) {
+        toast({ variant: 'destructive', title: 'Missing Image', description: 'Please upload at least one product image to generate content.' });
+        return;
+    }
+    setIsGenerating(true);
 
     try {
-        const uploadPromises = Array.from(files).map(async file => {
+        // Fetch the first image and convert it to a data URI
+        const response = await fetch(imageUrls[0]);
+        const blob = await response.blob();
+        const imageDataUri = await fileToDataUri(new File([blob], "image"));
+        
+        const result = await generateProductContent({
+            name,
+            category,
+            imageDataUri
+        });
+
+        form.setValue('description', result.description, { shouldValidate: true });
+        form.setValue('longDescription', result.longDescription, { shouldValidate: true });
+        
+        // Handle the generated poster image
+        const posterBlob = await (await fetch(result.posterImageUrl)).blob();
+        const posterFile = new File([posterBlob], `${name.toLowerCase().replace(/\s+/g, '-')}-poster.png`, { type: 'image/png' });
+        
+        await handleImageUpload(new File([posterFile]));
+
+        toast({ title: 'AI Content Generated', description: 'Descriptions and a poster have been created for you.' });
+    } catch (e) {
+        console.error('AI generation error:', e);
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        toast({ variant: 'destructive', title: 'AI Generation Failed', description: errorMessage });
+    } finally {
+        setIsGenerating(false);
+    }
+  }
+
+  const handleImageUpload = async (fileOrFiles: File | FileList | null) => {
+    if (!fileOrFiles) return;
+    setIsUploading(true);
+
+    const files = 'length' in fileOrFiles ? Array.from(fileOrFiles) : [fileOrFiles];
+    if(files.length === 0) {
+        setIsUploading(false);
+        return;
+    }
+
+    try {
+        const uploadPromises = files.map(async file => {
              const response = await fetch(`/api/upload?filename=${file.name}`, {
                 method: 'POST',
                 body: file,
@@ -102,7 +162,7 @@ export default function AddProductPage() {
     <Card>
       <CardHeader>
         <CardTitle>Add a New Product</CardTitle>
-        <CardDescription>Fill out the details for your new product.</CardDescription>
+        <CardDescription>Fill out the details for your new product, or use AI to help generate content.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -135,14 +195,24 @@ export default function AddProductPage() {
                     <FormMessage />
                   </FormItem>
                 )} />
-
-                <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem><FormLabel>Short Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
                 
-                <FormField control={form.control} name="longDescription" render={({ field }) => (
-                  <FormItem><FormLabel>Long Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
-                )} />
+                <div className="space-y-1">
+                    <div className="flex justify-between items-center mb-2">
+                         <h3 className="text-lg font-semibold">Content</h3>
+                         <Button type="button" variant="outline" size="sm" onClick={handleAiGenerate} disabled={isGenerating || isUploading}>
+                            {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Generate with AI
+                         </Button>
+                    </div>
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem><FormLabel>Short Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    
+                    <FormField control={form.control} name="longDescription" render={({ field }) => (
+                      <FormItem><FormLabel>Long Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                </div>
                 
                 <FormField control={form.control} name="tags" render={({ field }) => (
                   <FormItem><FormLabel>Tags (comma-separated)</FormLabel><FormControl><Input {...field} placeholder="e.g. vegan, hydrating, summer" /></FormControl><FormMessage /></FormItem>
