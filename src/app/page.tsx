@@ -1,7 +1,7 @@
 
 'use client';
 
-import { getProducts } from '@/actions/product-actions';
+import { getProducts, seedSampleProduct } from '@/actions/product-actions';
 import ProductGrid from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -49,12 +49,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductsAndSeed = async () => {
+        await seedSampleProduct(); // This will seed the product if it doesn't exist
         const allProducts = await getProducts();
         setProducts(allProducts.slice(0, 8));
         setLoading(false);
     }
-    fetchProducts();
+    fetchProductsAndSeed();
   }, []);
 
   const variants = {
@@ -136,7 +137,7 @@ export default function Home() {
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Face Cream" dataAiHint="face cream product" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://picsum.photos/400/400?random=1" title="Body Spray" dataAiHint="perfume bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
                 <CategoryCard img="https://picsum.photos/400/400?random=2" title="Lipstick" dataAiHint="lipstick swatch" />
                 <CategoryCard img="https://picsum.photos/400/400?random=3" title="Foundation" dataAiHint="foundation bottle" />
               </div>

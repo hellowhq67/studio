@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Product } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, serverTimestamp, updateDoc, query, where } from 'firebase/firestore';
 
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name is too short'),
@@ -117,4 +117,40 @@ export async function getProductById(id: string): Promise<Product | null> {
         console.error("Error fetching product by ID:", error);
         return null;
     }
+}
+
+export async function seedSampleProduct() {
+  try {
+    const productsCollection = collection(db, 'products');
+    const q = query(productsCollection, where("name", "==", "Radiant Glow Serum"));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.log('Seeding sample product...');
+      const sampleProduct = {
+        name: 'Radiant Glow Serum',
+        description: 'A powerful serum to boost your skin\'s natural radiance.',
+        longDescription: 'Our Radiant Glow Serum is packed with Vitamin C and Hyaluronic Acid to brighten, hydrate, and rejuvenate your skin. Lightweight and fast-absorbing, it targets dark spots and dullness for a visibly brighter complexion.',
+        price: 45.00,
+        salePrice: 38.00,
+        rating: 4.8,
+        reviewCount: 152,
+        category: 'Skincare',
+        images: ['https://storage.googleapis.com/gemini-studio-assets/project-images/b4893708-5d25-4504-86dd-e13768b99529.jpeg'],
+        tags: ['vegan', 'hydrating', 'brightening'],
+        quantity: 50,
+        deliveryTime: '2-3 business days',
+        brand: 'GlowUp',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+      await addDoc(productsCollection, sampleProduct);
+      console.log('Sample product seeded successfully.');
+      revalidatePath('/products');
+    } else {
+      console.log('Sample product already exists.');
+    }
+  } catch (error) {
+    console.error("Error seeding sample product:", error);
+  }
 }
