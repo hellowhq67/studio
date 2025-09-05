@@ -1,12 +1,15 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
-import { Star, ShoppingBag, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingBag, Minus, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useCurrency } from '@/hooks/useCurrency';
+import { Card, CardContent } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -31,35 +34,28 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   return (
     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
       <div className="grid gap-4">
-        <div className="aspect-square w-full overflow-hidden rounded-lg shadow-lg">
-          <img
-            src={activeImage}
-            alt={product.name}
-            width={800}
-            height={800}
-            className="w-full h-full object-cover"
-            data-ai-hint={`${product.category} product detail`}
-          />
-        </div>
-        {product.images.length > 1 && (
-          <div className="grid grid-cols-4 gap-4">
-            {product.images.map((img, idx) => (
-              <button
-                key={idx}
-                className={`aspect-square w-full rounded-md overflow-hidden ring-offset-background ring-2 ${activeImage === img ? 'ring-primary' : 'ring-transparent'}`}
-                onClick={() => setActiveImage(img)}
-              >
-                <img
-                  src={img}
-                  alt={`${product.name} thumbnail ${idx + 1}`}
-                  width={200}
-                  height={200}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
+        <Carousel className="w-full">
+            <CarouselContent>
+                {product.images.map((img, index) => (
+                    <CarouselItem key={index}>
+                        <Card>
+                            <CardContent className="flex aspect-square items-center justify-center p-0">
+                               <img
+                                  src={img}
+                                  alt={`${product.name} image ${index + 1}`}
+                                  width={800}
+                                  height={800}
+                                  className="w-full h-full object-cover rounded-lg"
+                                  data-ai-hint={`${product.category} product detail`}
+                                />
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-4" />
+            <CarouselNext className="right-4" />
+        </Carousel>
       </div>
 
       <div className="flex flex-col h-full">
