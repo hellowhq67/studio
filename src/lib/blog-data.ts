@@ -8,7 +8,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Achieve a perfect, long-lasting base with our step-by-step guide to applying foundation. Learn the secrets from professional makeup artists.',
     author: 'Alexia Glow',
     date: '2024-07-15',
-    image: 'https://picsum.photos/1200/800?random=1',
+    image: 'https://storage.googleapis.com/gemini-studio-assets/project-images/42f9b33a-6b83-42e6-8987-9d41b5258e72.jpeg',
     content: `
       <h2>Step 1: Skin Preparation is Key</h2>
       <p>Before you even think about foundation, a clean and moisturized canvas is crucial. Start with a gentle cleanser, followed by a hydrating toner and a lightweight moisturizer. Let your skincare products absorb for at least 5 minutes. For an extra smooth base, apply a primer suited for your skin type—mattifying for oily skin, hydrating for dry skin, or pore-filling for visible pores.</p>
@@ -29,7 +29,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Unlock your skin\'s potential with these powerhouse ingredients. Learn what they do and how to incorporate them into your daily routine for a healthy glow.',
     author: 'Casey Derma',
     date: '2024-07-10',
-    image: 'https://picsum.photos/1200/800?random=2',
+    image: 'https://storage.googleapis.com/gemini-studio-assets/project-images/75949175-1049-4340-8b10-189a05b4a742.jpeg',
     content: `
       <h2>1. Hyaluronic Acid: The Hydration Hero</h2>
       <p>Hyaluronic Acid is a humectant that can hold up to 1000 times its weight in water, making it a superstar for hydration. It plumps up the skin, reduces the appearance of fine lines, and gives a dewy, supple look. It's suitable for all skin types.</p>
@@ -53,7 +53,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Feeling overwhelmed by the variety of makeup brushes? Our beginner\'s guide breaks down the essential brushes you need and how to use them.',
     author: 'Jen Brushstroke',
     date: '2024-07-05',
-    image: 'https://picsum.photos/1200/800?random=3',
+    image: 'https://storage.googleapis.com/gemini-studio-assets/project-images/0b45d55b-77c8-4720-a685-613d9697d81a.jpeg',
     content: `
       <h2>The Face Essentials</h2>
       <ul>
@@ -80,7 +80,7 @@ export const blogPosts: BlogPost[] = [
     description: 'The sun, salt, and chlorine can wreak havoc on your hair. Follow these essential tips to keep your locks healthy, shiny, and protected all summer long.',
     author: 'Serena Strands',
     date: '2024-06-28',
-    image: 'https://picsum.photos/1200/800?random=4',
+    image: 'https://storage.googleapis.com/gemini-studio-assets/project-images/9140c838-51bb-455b-8032-4e0d421f2eed.jpeg',
     content: `
       <p>Summer fun shouldn't mean sacrificing your hair's health. Here's how to protect it.</p>
       <ol>

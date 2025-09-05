@@ -11,8 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
 import PopupBanner from '@/components/home/PopupBanner';
 import AiAssistant from '@/components/home/AiAssistant';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
 
 
@@ -42,6 +42,23 @@ const heroContent = {
   }
 };
 
+function ParallaxSection({ children, className }: { children: React.ReactNode, className?: string }) {
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ['start end', 'end start']
+    });
+    const y = useTransform(scrollYProgress, [0, 1], ['-15%', '15%']);
+
+    return (
+        <motion.section ref={ref} className={className}>
+            <motion.div style={{ y }}>
+                {children}
+            </motion.div>
+        </motion.section>
+    )
+}
+
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -67,7 +84,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-background">
+    <div className="bg-background overflow-x-hidden">
       <PopupBanner />
       <AiAssistant />
       {/* Hero Section */}
@@ -120,13 +137,7 @@ export default function Home() {
       </motion.section>
       
       {/* Popular Categories */}
-      <motion.section 
-        className="py-16 bg-card"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={variants}
-      >
+       <ParallaxSection className="py-16 bg-card">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
@@ -141,16 +152,10 @@ export default function Home() {
                 <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
               </div>
           </div>
-      </motion.section>
+      </ParallaxSection>
 
       {/* Beauty Care Products */}
-      <motion.section 
-        className="py-16"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={variants}
-      >
+       <ParallaxSection className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Button variant="outline" className="rounded-full pointer-events-none mb-2">Top Brands</Button>
@@ -163,16 +168,10 @@ export default function Home() {
                 </Button>
            </div>
         </div>
-      </motion.section>
+      </ParallaxSection>
 
        {/* Featured Banners */}
-      <motion.section 
-        className="container mx-auto px-4 sm:px-6 lg:px-8 py-8"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={variants}
-      >
+      <ParallaxSection className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="bg-card p-8 rounded-lg flex items-center">
             <div className="flex-1">
@@ -201,16 +200,10 @@ export default function Home() {
               </div>
           </div>
         </div>
-      </motion.section>
+      </ParallaxSection>
       
        {/* Highly Performing CTA */}
-      <motion.section 
-        className="py-16"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={variants}
-      >
+      <ParallaxSection className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/7a421a97-920f-48d6-953e-f14d86b856a1.jpeg" alt="Flash Sale Banner" className="w-full h-full object-cover" data-ai-hint="cosmetic product sale" />
@@ -226,16 +219,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </ParallaxSection>
       
       {/* Testimonials */}
-       <motion.section 
-          className="py-16 bg-card"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
-          variants={variants}
-        >
+       <ParallaxSection className="py-16 bg-card">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
@@ -257,37 +244,59 @@ export default function Home() {
                 </div>
             </div>
           </div>
-       </motion.section>
+       </ParallaxSection>
        
        {/* Blog Section */}
-        <motion.section 
-            className="py-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={variants}
-        >
+        <ParallaxSection className="py-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                  <div className="text-center mb-12">
                     <Button variant="outline" className="rounded-full pointer-events-none mb-2">Recent News</Button>
                     <h2 className="text-4xl font-bold">From The Blog</h2>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="bg-card rounded-lg overflow-hidden shadow-sm">
-                            <img src={`https://storage.googleapis.com/gemini-studio-assets/project-images/172e2938-7557-416b-9c99-382d5a35ba16.jpeg`} alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
-                            <div className="p-6">
-                                <p className="text-sm text-muted-foreground mb-2">Dec 22, 2022 - By Admin</p>
-                                <h3 className="font-bold text-lg mb-4">Including Animation in Your Design System</h3>
-                                <Link href="#" className="text-primary font-semibold flex items-center gap-2">
-                                    Read More <ArrowRight size={16} />
-                                </Link>
-                            </div>
+                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                        <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/42f9b33a-6b83-42e6-8987-9d41b5258e72.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="beauty lifestyle" />
+                        <div className="p-6">
+                            <p className="text-sm text-muted-foreground mb-2">Jul 15, 2024 - By Alexia Glow</p>
+                            <h3 className="font-bold text-lg mb-4">The Ultimate Guide to a Flawless Foundation Routine</h3>
+                            <Link href="/blog/ultimate-guide-flawless-foundation" className="text-primary font-semibold flex items-center gap-2">
+                                Read More <ArrowRight size={16} />
+                            </Link>
                         </div>
-                    ))}
+                    </div>
+                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                        <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/75949175-1049-4340-8b10-189a05b4a742.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="skincare products" />
+                        <div className="p-6">
+                            <p className="text-sm text-muted-foreground mb-2">Jul 10, 2024 - By Casey Derma</p>
+                            <h3 className="font-bold text-lg mb-4">5 Must-Have Skincare Ingredients for Radiant Skin</h3>
+                            <Link href="/blog/5-must-have-skincare-ingredients" className="text-primary font-semibold flex items-center gap-2">
+                                Read More <ArrowRight size={16} />
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                        <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/0b45d55b-77c8-4720-a685-613d9697d81a.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="makeup brushes" />
+                        <div className="p-6">
+                            <p className="text-sm text-muted-foreground mb-2">Jul 05, 2024 - By Jen Brushstroke</p>
+                            <h3 className="font-bold text-lg mb-4">Decoding Makeup Brushes: A Beginner's Guide</h3>
+                            <Link href="/blog/decoding-makeup-brushes" className="text-primary font-semibold flex items-center gap-2">
+                                Read More <ArrowRight size={16} />
+                            </Link>
+                        </div>
+                    </div>
+                     <div className="bg-card rounded-lg overflow-hidden shadow-sm">
+                        <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/9140c838-51bb-455b-8032-4e0d421f2eed.jpeg" alt="Blog post" className="w-full h-48 object-cover" data-ai-hint="summer hair" />
+                        <div className="p-6">
+                            <p className="text-sm text-muted-foreground mb-2">Jun 28, 2024 - By Serena Strands</p>
+                            <h3 className="font-bold text-lg mb-4">Top 7 Summer Hair Care Tips to Beat the Heat</h3>
+                            <Link href="/blog/summer-hair-care-tips" className="text-primary font-semibold flex items-center gap-2">
+                                Read More <ArrowRight size={16} />
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </motion.section>
+        </ParallaxSection>
 
     </div>
   );
