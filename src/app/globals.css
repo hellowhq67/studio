@@ -23,7 +23,6 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 217 91% 60%;
-    --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -32,7 +31,7 @@
   }
 
   .dark {
-    --background: 223 23% 9%;
+    --background: 223 23% 7%;
     --foreground: 0 0% 98%;
     --card: 223 23% 11%;
     --card-foreground: 0 0% 98%;
@@ -60,9 +59,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    background: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--primary) / 0.3), transparent),
-      radial-gradient(ellipse 80% 50% at 50% 120%, hsl(var(--accent) / 0.15), transparent),
-      hsl(var(--background));
+  }
+  
+  .dark body {
+    background: linear-gradient(180deg, hsl(223, 23%, 7%), hsl(260, 20%, 9%));
   }
 }
