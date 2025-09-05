@@ -8,6 +8,7 @@ import { AuthProvider } from '@/hooks/useAuth';
 import { GeistSans } from 'geist/font/sans';
 import { CurrencyProvider } from '@/hooks/useCurrency';
 import { app } from '@/lib/firebase'; // Ensure firebase is initialized
+import { ThemeProvider } from '@/components/theme-provider';
 
 
 export const metadata: Metadata = {
@@ -28,16 +29,23 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${GeistSans.variable} font-sans antialiased flex flex-col min-h-screen`}>
-        <AuthProvider>
-          <CurrencyProvider>
-            <CartProvider>
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </CartProvider>
-          </CurrencyProvider>
-        </AuthProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <CurrencyProvider>
+              <CartProvider>
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </CartProvider>
+            </CurrencyProvider>
+          </AuthProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

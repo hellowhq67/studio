@@ -14,6 +14,7 @@ import AiAssistantLoader from '@/components/home/AiAssistantLoader';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
+import { SpotlightPreview } from '@/components/home/SpotlightPreview';
 
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
@@ -71,53 +72,7 @@ export default function Home() {
       <PopupBanner />
       <AiAssistantLoader />
       {/* Hero Section */}
-      <motion.section 
-        className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
-        initial="hidden"
-        animate="visible"
-        variants={variants}
-      >
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="md:col-start-1">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight mb-4">
-              Evanie Glow Cosmetics
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Discover our new cosmetics. We believe in the power of nature to reveal your natural beauty and glow.
-            </p>
-            <Button size="lg" asChild>
-              <Link href="/products">Explore Collection <ArrowRight className="ml-2 h-5 w-5" /></Link>
-            </Button>
-          </div>
-          <div className="relative flex items-center justify-center gap-4">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="relative w-40 h-64 rounded-t-full rounded-b-lg overflow-hidden shadow-lg">
-                 <img src={heroContent.sideImage.src} alt={heroContent.sideImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.sideImage['data-ai-hint']} />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="relative w-64 h-96 rounded-t-full rounded-b-lg overflow-hidden shadow-2xl">
-                 <img src={heroContent.mainImage.src} alt={heroContent.mainImage.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.mainImage['data-ai-hint']} />
-            </motion.div>
-             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.6 }} className="absolute top-1/2 -right-16 bg-card p-4 rounded-lg shadow-lg w-48">
-                <p className="font-bold">Luxurious Beauty Product</p>
-                 <div className="w-full h-24 my-2 rounded-md overflow-hidden">
-                    <img src={heroContent.productCard.src} alt={heroContent.productCard.alt} className="w-full h-full object-cover" data-ai-hint={heroContent.productCard['data-ai-hint']}/>
-                </div>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <p className="font-bold text-lg">$25.00</p>
-                        <div className="flex text-yellow-400">
-                           <Star size={16} fill="currentColor" />
-                           <Star size={16} fill="currentColor" />
-                           <Star size={16} fill="currentColor" />
-                           <Star size={16} fill="currentColor" />
-                           <Star size={16} />
-                        </div>
-                    </div>
-                    <Button size="sm">Buy Now</Button>
-                </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
+      <SpotlightPreview />
       
       {/* Popular Categories */}
        <section className="py-16 bg-card/50">
@@ -289,5 +244,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
