@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
 import { SpotlightPreview } from '@/components/home/SpotlightPreview';
+import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
 
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
@@ -25,23 +26,43 @@ const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, 
     </Link>
 )
 
-const heroContent = {
-  mainImage: {
-    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-043910.png",
-    alt: "A radiant model showcasing Evanie Glow cosmetics",
-    "data-ai-hint": "beauty model face"
+const testimonials = [
+  {
+    quote:
+      "This is the best beauty product I've ever used. My skin feels amazing and looks so radiant. I highly recommend it to everyone!",
+    name: 'Jenny Wilson',
+    title: 'Marketing Coordinator',
+    image: 'https://storage.googleapis.com/gemini-studio-assets/project-images/4915089c-3642-4265-af34-4a43b2933939.jpeg',
   },
-  sideImage: {
-    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/download.jpeg",
-    alt: "A portrait of a model with elegant makeup",
-    "data-ai-hint": "beauty model portrait"
+  {
+    quote:
+      "The Radiant Glow Serum has completely transformed my skincare routine. I've never received so many compliments on my skin. A must-have!",
+    name: 'Sarah Thompson',
+    title: 'Graphic Designer',
+    image: 'https://picsum.photos/100/100?random=10',
   },
-  productCard: {
-    src: "https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png",
-    alt: "A luxurious cosmetic product bottle from Evanie Glow",
-    "data-ai-hint": "cosmetic product bottle"
-  }
-};
+  {
+    quote:
+      "I was skeptical at first, but the results speak for themselves. The Velvet Matte Lipstick lasts all day without drying out my lips. Incredible quality.",
+    name: 'Jessica Miller',
+    title: 'Software Engineer',
+    image: 'https://picsum.photos/100/100?random=11',
+  },
+  {
+    quote:
+      'As a professional makeup artist, I am very picky about the products I use. Evanie Glow has exceeded all my expectations. The quality is simply superb.',
+    name: 'Emily Rodriguez',
+    title: 'Makeup Artist',
+    image: 'https://picsum.photos/100/100?random=12',
+  },
+  {
+    quote:
+      'Customer service is top-notch, and the products are even better. The Midnight Bloom perfume is my new signature scent. I feel so confident wearing it.',
+    name: 'Laura Chen',
+    title: 'Project Manager',
+    image: 'https://picsum.photos/100/100?random=13',
+  },
+];
 
 
 export default function Home() {
@@ -166,20 +187,12 @@ export default function Home() {
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
                 <h2 className="text-4xl font-bold">What Our Clients Say</h2>
             </div>
-             <div className="relative">
-                <div className="text-center max-w-2xl mx-auto">
-                    <p className="text-lg text-muted-foreground mb-6">"This is the best beauty product I've ever used. My skin feels amazing and looks so radiant. I highly recommend it to everyone!"</p>
-                    <div className="flex justify-center items-center gap-4">
-                        <Avatar>
-                            <AvatarImage src="https://storage.googleapis.com/gemini-studio-assets/project-images/4915089c-3642-4265-af34-4a43b2933939.jpeg" alt="Jenny Wilson" data-ai-hint="woman smiling"/>
-                            <AvatarFallback>JW</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-bold">Jenny Wilson</p>
-                            <p className="text-sm text-muted-foreground">Marketing Coordinator</p>
-                        </div>
-                    </div>
-                </div>
+             <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-md">
+                <InfiniteMovingCards
+                    items={testimonials}
+                    direction="right"
+                    speed="slow"
+                />
             </div>
           </div>
        </section>
@@ -244,3 +257,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
