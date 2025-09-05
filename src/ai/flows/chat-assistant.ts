@@ -33,6 +33,7 @@ const getProductsTool = ai.defineTool(
         category: z.string(),
         brand: z.string(),
         images: z.array(z.string()),
+        deliveryCharge: z.number().optional(),
       })),
     },
     async (input) => {
@@ -103,6 +104,8 @@ const getCheckoutUrlTool = ai.defineTool(
 // Input Schema for the main chat flow
 const ChatAssistantInputSchema = z.object({
   query: z.string().describe('The user\'s message to the assistant.'),
+  userName: z.string().optional().describe('The name of the user, if they are logged in.'),
+  history: z.array(z.any()).optional().describe('The conversation history.'),
 });
 export type ChatAssistantInput = z.infer<typeof ChatAssistantInputSchema>;
 
@@ -187,11 +190,17 @@ const chatPrompt = ai.definePrompt({
   prompt: `You are Eva, a friendly and helpful AI shopping assistant for an e-commerce store called "Evanie Glow".
   Your goal is to provide a delightful and seamless shopping experience.
   
-  - Greet the user warmly and introduce yourself.
+  {{#if userName}}
+  The user you are talking to is named {{userName}}. Greet them by name.
+  {{else}}
+  Greet the user warmly and introduce yourself.
+  {{/if}}
+  
   - Proactively suggest products, especially those on sale or with special offers like free delivery. Use the getProductsTool for this.
   - When you find products, list them in your reply and also return the product data in the 'products' output field.
   - If a user wants to add an item to their cart, use the addToCartTool. Confirm what was added.
   - If a user asks to checkout or is ready to pay, use the getCheckoutUrlTool and provide the link in your reply. Set the 'checkoutUrl' output field.
+  - Use the conversation history to understand the context of the user's request.
 
   User query: {{{query}}}`,
 });
@@ -236,7 +245,7 @@ const textToSpeechFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            prebuiltVoiceConfig: { voiceName: 'Calytrix' }, // Using a female voice
           },
         },
       },

@@ -13,8 +13,14 @@ import type { Product } from '@/lib/types';
 import ProductCard from '../products/ProductCard';
 import { useCart } from '@/hooks/useCart';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
+import { getProducts } from '@/actions/product-actions';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+
 
 type Message = {
+  id: number;
   role: 'user' | 'assistant';
   text: string;
   products?: Product[];
@@ -28,21 +34,42 @@ const suggestedPrompts = [
   "I'm looking for a gift."
 ];
 
-const welcomeMessage: Message = {
-    role: 'assistant',
-    text: "Hi, I'm Eva, your friendly shopping assistant! How can I help you today? You can ask me about products, sales, or anything else you need.",
-};
 
 export default function AiAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([welcomeMessage]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const { addItem, clearCart } = useCart(); // Assuming addItem is stable
+  const [hasWelcomed, setHasWelcomed] = useState(false);
+  const { addItem } = useCart();
+  const { user } = useAuth();
+
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  }
+
+  useEffect(() => {
+    if (isOpen && !hasWelcomed) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        const welcomeMessage: Message = {
+            id: Date.now(),
+            role: 'assistant',
+            text: `Hi ${user?.displayName || ''}, I'm Eva, your friendly shopping assistant! How can I help you today? You can ask me about products, sales, or anything else you need.`,
+        };
+        setMessages([welcomeMessage]);
+        setIsLoading(false);
+        setHasWelcomed(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, hasWelcomed, user]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -99,15 +126,21 @@ export default function AiAssistant() {
     const text = messageText || input;
     if (!text.trim()) return;
 
-    const userMessage: Message = { role: 'user', text };
+    const userMessage: Message = { id: Date.now(), role: 'user', text };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const response = await chatAssistant({ query: text });
+      const historyForGenkit = messages.map(({id, ...rest}) => rest);
+      const response = await chatAssistant({ 
+        query: text,
+        userName: user?.displayName || undefined,
+        history: historyForGenkit,
+      });
       
       const assistantMessage: Message = { 
+        id: Date.now() + 1,
         role: 'assistant', 
         text: response.reply,
         products: (response.products as Product[] || []).map(p => ({...p, deliveryCharge: p.deliveryCharge || 0})),
@@ -115,14 +148,11 @@ export default function AiAssistant() {
       };
 
       // Check if a product was added to the cart by the assistant
-      const toolCalls = (response as any).toolCalls;
-      if (toolCalls) {
-        const addToCartCall = toolCalls.find((call: any) => call.tool === 'addToCart');
-        if (addToCartCall) {
-            const product = await getProducts().then(prods => prods.find(p => p.id === addToCartCall.args.productId));
-            if(product) {
-                addItem(product, addToCartCall.args.quantity);
-            }
+      if ((response as any)?.toolCalls?.some((c: any) => c.tool === 'addToCart')) {
+        const productCall = (response as any).toolCalls.find((c: any) => c.tool === 'addToCart');
+        const product = await getProducts().then(prods => prods.find(p => p.id === productCall.args.productId));
+        if (product) {
+            addItem(product, productCall.args.quantity);
         }
       }
       
@@ -135,11 +165,16 @@ export default function AiAssistant() {
 
     } catch (error) {
       console.error('AI Assistant Error:', error);
-      const errorMessage: Message = { role: 'assistant', text: 'Sorry, I am having trouble connecting. Please try again.' };
+      const errorMessage: Message = { id: Date.now() + 1, role: 'assistant', text: 'Sorry, I am having trouble connecting. Please try again.' };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const messageVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -156,7 +191,13 @@ export default function AiAssistant() {
       )}>
         <Card className="w-full h-full flex flex-col shadow-2xl">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2"><Bot /> Eva</CardTitle>
+             <CardTitle className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
+                    <AvatarFallback>E</AvatarFallback>
+                </Avatar>
+                Eva
+            </CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />
             </Button>
@@ -164,10 +205,24 @@ export default function AiAssistant() {
           <CardContent className="flex-grow flex flex-col p-0">
             <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
               <div className="space-y-4">
+                <AnimatePresence>
                 {messages.map((msg, index) => (
-                  <div key={index} className={cn('flex flex-col gap-2', msg.role === 'user' ? 'items-end' : 'items-start')}>
+                  <motion.div 
+                    key={msg.id} 
+                    className={cn('flex flex-col gap-2', msg.role === 'user' ? 'items-end' : 'items-start')}
+                    variants={messageVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
                      <div className={cn('flex items-end gap-2 w-full', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                        {msg.role === 'assistant' && <Bot className="w-6 h-6 text-primary flex-shrink-0 self-start" />}
+                        {msg.role === 'assistant' && (
+                             <Avatar className="h-8 w-8 flex-shrink-0 self-start">
+                                <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
+                                <AvatarFallback>E</AvatarFallback>
+                            </Avatar>
+                        )}
                         <div className={cn(
                           'max-w-[85%] p-3 rounded-lg',
                           msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
@@ -179,6 +234,12 @@ export default function AiAssistant() {
                                 </Button>
                             )}
                         </div>
+                        {msg.role === 'user' && (
+                             <Avatar className="h-8 w-8 flex-shrink-0 self-start">
+                                <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                                <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                            </Avatar>
+                        )}
                      </div>
                      {msg.role === 'assistant' && msg.products && msg.products.length > 0 && (
                         <div className="grid grid-cols-1 gap-2 mt-2 w-full pl-8">
@@ -187,25 +248,45 @@ export default function AiAssistant() {
                             ))}
                         </div>
                      )}
-                  </div>
+                  </motion.div>
                 ))}
-                 {messages.length === 1 && !isLoading && (
-                    <div className="pt-4 pl-8 space-y-2">
+                </AnimatePresence>
+                 {hasWelcomed && messages.length === 1 && !isLoading && (
+                    <motion.div
+                        className="pt-4 pl-8 space-y-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                    >
                         <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary" />Suggestions</p>
-                        {suggestedPrompts.map(prompt => (
-                            <Button key={prompt} variant="outline" size="sm" className="w-full justify-start h-auto py-2 text-left" onClick={() => handleSendMessage(prompt)}>
-                                {prompt}
-                            </Button>
+                        {suggestedPrompts.map((prompt, i) => (
+                            <motion.div
+                                key={prompt}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 + i * 0.1 }}
+                            >
+                                <Button variant="outline" size="sm" className="w-full justify-start h-auto py-2 text-left" onClick={() => handleSendMessage(prompt)}>
+                                    {prompt}
+                                </Button>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                  )}
                 {isLoading && (
-                   <div className='flex items-end gap-2 justify-start mt-4'>
-                      <Bot className="w-6 h-6 text-primary flex-shrink-0" />
+                   <motion.div
+                    className='flex items-end gap-2 justify-start mt-4'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                   >
+                        <Avatar className="h-8 w-8 flex-shrink-0 self-start">
+                           <AvatarImage src="https://s4l5h54ozlgwxxa4.public.blob.vercel-storage.com/eva/Screenshot_20250903-044810.png" alt="Eva" />
+                           <AvatarFallback>E</AvatarFallback>
+                       </Avatar>
                       <div className="bg-muted p-3 rounded-lg">
                          <Loader2 className="w-5 h-5 animate-spin"/>
                       </div>
-                   </div>
+                   </motion.div>
                 )}
               </div>
             </ScrollArea>
