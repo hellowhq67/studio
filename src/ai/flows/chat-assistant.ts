@@ -164,7 +164,7 @@ const chatAssistantFlow = ai.defineFlow(
       return { reply: "I'm sorry, I couldn't generate a response. Please try again.", products: [] };
     }
 
-    // Ensure products array is always present
+    // Ensure products array is always present, even if the model hallucinates it as null or undefined.
     if (!output.products) {
       output.products = [];
     }
