@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/products/ProductCard';
 import PopupBanner from '@/components/home/PopupBanner';
 import AiAssistantLoader from '@/components/home/AiAssistantLoader';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
 
@@ -41,23 +41,6 @@ const heroContent = {
     "data-ai-hint": "cosmetic product bottle"
   }
 };
-
-function ParallaxSection({ children, className }: { children: React.ReactNode, className?: string }) {
-    const ref = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        offset: ['start end', 'end start']
-    });
-    const y = useTransform(scrollYProgress, [0, 1], ['-15%', '15%']);
-
-    return (
-        <motion.section ref={ref} className={className}>
-            <motion.div style={{ y }}>
-                {children}
-            </motion.div>
-        </motion.section>
-    )
-}
 
 
 export default function Home() {
@@ -137,7 +120,7 @@ export default function Home() {
       </motion.section>
       
       {/* Popular Categories */}
-       <ParallaxSection className="py-16 bg-card/50">
+       <section className="py-16 bg-card/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
@@ -148,14 +131,14 @@ export default function Home() {
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Makeup" dataAiHint="face cream product" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Haircare" dataAiHint="woman skincare routine" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Fragrance" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Body Spray" dataAiHint="body spray" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Body Spray" dataAiHint="body spray" />
                 <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
               </div>
           </div>
-      </ParallaxSection>
+      </section>
 
       {/* Beauty Care Products */}
-       <ParallaxSection className="py-16">
+       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Button variant="outline" className="rounded-full pointer-events-none mb-2">Top Brands</Button>
@@ -168,10 +151,10 @@ export default function Home() {
                 </Button>
            </div>
         </div>
-      </ParallaxSection>
+      </section>
 
        {/* Featured Banners */}
-      <ParallaxSection className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="bg-card/50 p-8 rounded-lg flex items-center">
             <div className="flex-1">
@@ -200,10 +183,10 @@ export default function Home() {
               </div>
           </div>
         </div>
-      </ParallaxSection>
+      </section>
       
        {/* Highly Performing CTA */}
-      <ParallaxSection className="py-16">
+      <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-lg overflow-hidden">
             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/7a421a97-920f-48d6-953e-f14d86b856a1.jpeg" alt="Flash Sale Banner" className="w-full h-full object-cover" data-ai-hint="cosmetic product sale" />
@@ -219,10 +202,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </ParallaxSection>
+      </section>
       
       {/* Testimonials */}
-       <ParallaxSection className="py-16 bg-card/50">
+       <section className="py-16 bg-card/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Testimonial</Button>
@@ -244,10 +227,10 @@ export default function Home() {
                 </div>
             </div>
           </div>
-       </ParallaxSection>
+       </section>
        
        {/* Blog Section */}
-        <ParallaxSection className="py-16">
+        <section className="py-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                  <div className="text-center mb-12">
                     <Button variant="outline" className="rounded-full pointer-events-none mb-2">Recent News</Button>
@@ -301,8 +284,10 @@ export default function Home() {
                     </Button>
                 </div>
             </div>
-        </ParallaxSection>
+        </section>
 
     </div>
   );
 }
+
+    
