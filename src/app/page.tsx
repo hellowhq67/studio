@@ -148,7 +148,7 @@ export default function Home() {
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Makeup" dataAiHint="face cream product" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Haircare" dataAiHint="woman skincare routine" />
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Fragrance" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Body Spray" dataAiHint="lipstick swatch" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Body Spray" dataAiHint="body spray" />
                 <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
               </div>
           </div>
