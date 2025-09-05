@@ -134,11 +134,11 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
                 <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Face Cream" dataAiHint="face cream product" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Lipstick" dataAiHint="lipstick swatch" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Foundation" dataAiHint="foundation bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Face Cream" dataAiHint="face cream product" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
+                <CategoryCard img="https://picsum.photos/400/400?random=1" title="Body Spray" dataAiHint="perfume bottle" />
+                <CategoryCard img="https://picsum.photos/400/400?random=2" title="Lipstick" dataAiHint="lipstick swatch" />
+                <CategoryCard img="https://picsum.photos/400/400?random=3" title="Foundation" dataAiHint="foundation bottle" />
               </div>
           </div>
       </motion.section>
