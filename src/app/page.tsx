@@ -16,7 +16,6 @@ import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
 import { Spotlight } from '@/components/ui/spotlight';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import { FocusCards, Card as FocusCard } from '@/components/ui/focus-cards';
 import { BackgroundBeams } from '@/components/ui/background-beams';
 
 
@@ -25,6 +24,7 @@ const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, 
         <div className="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-2 border-transparent group-hover:border-primary transition-all duration-300">
             <img src={img} alt={title} className="w-full h-full object-cover" data-ai-hint={dataAiHint} />
         </div>
+        <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{title}</h3>
     </Link>
 )
 
@@ -65,34 +65,6 @@ const testimonials = [
     image: 'https://picsum.photos/100/100?random=13',
   },
 ];
-
-
-const categoryFocusItems = [
-    {
-        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg",
-        title: "Skincare",
-        description: "Pure ingredients for a natural glow.",
-        href: "/category/skincare"
-    },
-    {
-        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg",
-        title: "Makeup",
-        description: "Express your vibrant self.",
-        href: "/category/makeup"
-    },
-    {
-        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg",
-        title: "Haircare",
-        description: "Nourish your locks to perfection.",
-        href: "/category/haircare"
-    },
-    {
-        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg",
-        title: "Fragrance",
-        description: "Captivating scents for every mood.",
-        href: "/category/fragrance"
-    }
-]
 
 
 export default function Home() {
@@ -147,27 +119,11 @@ export default function Home() {
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
-              <div className="mx-auto max-w-5xl">
-                 <FocusCards>
-                    {categoryFocusItems.map((item, i) => (
-                        <FocusCard key={item.href}>
-                             <Link href={item.href}>
-                                <div className="relative h-full w-full overflow-hidden rounded-2xl bg-card">
-                                    <img src={item.url} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
-                                    <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/80 to-transparent" />
-                                    <div className="absolute inset-x-0 bottom-0 p-4">
-                                        <h3 className="mb-2 text-2xl font-medium text-white">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-sm text-zinc-300">
-                                            {item.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            </Link>
-                        </FocusCard>
-                    ))}
-                 </FocusCards>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                  <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/b4d673f3-a1b6-4e55-89f5-45a76f62364c.jpeg" title="Skincare" dataAiHint="skincare products" />
+                  <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/c8c50c5a-3c58-47d6-848e-0f0e7d7042f9.jpeg" title="Makeup" dataAiHint="makeup palette" />
+                  <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/01986161-2f08-4443-8588-448a31385dc9.jpeg" title="Body Spray" dataAiHint="body spray bottle" />
+                  <CategoryCard img="https://storage.googleapis.com/gemini-studio-assets/project-images/e8c8949c-939e-4e43-982e-6ea10c43666b.jpeg" title="Haircare" dataAiHint="haircare products" />
               </div>
           </div>
       </section>
@@ -316,3 +272,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
