@@ -17,12 +17,11 @@ import type { Product } from '@/lib/types';
 
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
-    <div className="text-center group">
+    <Link href={`/category/${title.toLowerCase().replace(/ /g, '-')}`} className="text-center group">
         <div className="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-2 border-transparent group-hover:border-primary transition-all duration-300">
             <img src={img} alt={title} className="w-full h-full object-cover" data-ai-hint={dataAiHint} />
         </div>
-        <h3 className="font-semibold text-lg">{title}</h3>
-    </div>
+    </Link>
 )
 
 const heroContent = {
@@ -134,12 +133,12 @@ export default function Home() {
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Eye Shadow" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Face Cream" dataAiHint="face cream product" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Skin Care" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Body Spray" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://picsum.photos/400/400?random=2" title="Lipstick" dataAiHint="lipstick swatch" />
-                <CategoryCard img="https://picsum.photos/400/400?random=3" title="Foundation" dataAiHint="foundation bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Skincare" dataAiHint="eyeshadow makeup" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Makeup" dataAiHint="face cream product" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Haircare" dataAiHint="woman skincare routine" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Fragrance" dataAiHint="perfume bottle" />
+                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Makeup" dataAiHint="lipstick swatch" />
+                <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
               </div>
           </div>
       </motion.section>
