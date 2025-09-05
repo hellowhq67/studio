@@ -97,11 +97,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   const handleAuthSuccess = async (firebaseUser: FirebaseUser) => {
     const appUser = await fetchUserAndSet(firebaseUser);
-    if (appUser?.role === 'ADMIN') {
-        router.push('/admin');
-    } else {
-        router.push('/account');
-    }
+    router.push('/admin');
   };
 
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
