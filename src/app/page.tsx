@@ -14,8 +14,10 @@ import AiAssistantLoader from '@/components/home/AiAssistantLoader';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
-import { SpotlightPreview } from '@/components/home/SpotlightPreview';
+import { Spotlight } from '@/components/ui/spotlight';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
+import { FocusCards, Card as FocusCard } from '@/components/ui/focus-cards';
+import { BackgroundBeams } from '@/components/ui/background-beams';
 
 
 const CategoryCard = ({ img, title, dataAiHint }: { img: string, title: string, dataAiHint: string }) => (
@@ -65,6 +67,34 @@ const testimonials = [
 ];
 
 
+const categoryFocusItems = [
+    {
+        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg",
+        title: "Skincare",
+        description: "Pure ingredients for a natural glow.",
+        href: "/category/skincare"
+    },
+    {
+        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg",
+        title: "Makeup",
+        description: "Express your vibrant self.",
+        href: "/category/makeup"
+    },
+    {
+        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg",
+        title: "Haircare",
+        description: "Nourish your locks to perfection.",
+        href: "/category/haircare"
+    },
+    {
+        url: "https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg",
+        title: "Fragrance",
+        description: "Captivating scents for every mood.",
+        href: "/category/fragrance"
+    }
+]
+
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,7 +123,22 @@ export default function Home() {
       <PopupBanner />
       <AiAssistantLoader />
       {/* Hero Section */}
-      <SpotlightPreview />
+      <div className="relative flex h-[40rem] w-full overflow-hidden rounded-md bg-background antialiased md:items-center md:justify-center">
+          <div className="relative z-10 mx-auto w-full max-w-7xl p-4 pt-20 md:pt-0">
+            <h1 className="bg-opacity-50 bg-gradient-to-b from-neutral-50 to-neutral-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
+              Evanie Glow
+            </h1>
+            <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-neutral-300">
+            Discover your inner radiance with our exquisite collection of cosmetics.
+            </p>
+            <div className="flex justify-center mt-8">
+                <Button asChild>
+                    <Link href="/products">Shop Now</Link>
+                </Button>
+            </div>
+          </div>
+          <BackgroundBeams />
+      </div>
       
       {/* Popular Categories */}
        <section className="py-16 bg-card/50">
@@ -102,13 +147,27 @@ export default function Home() {
                 <Button variant="outline" className="rounded-full pointer-events-none mb-2">Shop by categories</Button>
                 <h2 className="text-4xl font-bold text-center">Popular Categories</h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_37PM.jpeg" title="Skincare" dataAiHint="eyeshadow makeup" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_51PM.jpeg" title="Makeup" dataAiHint="face cream product" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_39PM.jpeg" title="Haircare" dataAiHint="woman skincare routine" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_58PM.jpeg" title="Fragrance" dataAiHint="perfume bottle" />
-                <CategoryCard img="https://arhil8oggbq9cksx.public.blob.vercel-storage.com/Generated%20Image%20September%2005%2C%202025%20-%209_59PM.jpeg" title="Body Spray" dataAiHint="body spray" />
-                <CategoryCard img="https://picsum.photos/400/400?random=3" title="Skincare" dataAiHint="foundation bottle" />
+              <div className="mx-auto max-w-5xl">
+                 <FocusCards>
+                    {categoryFocusItems.map((item, i) => (
+                        <FocusCard key={item.href}>
+                             <Link href={item.href}>
+                                <div className="relative h-full w-full overflow-hidden rounded-2xl bg-card">
+                                    <img src={item.url} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+                                    <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/80 to-transparent" />
+                                    <div className="absolute inset-x-0 bottom-0 p-4">
+                                        <h3 className="mb-2 text-2xl font-medium text-white">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm text-zinc-300">
+                                            {item.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </FocusCard>
+                    ))}
+                 </FocusCards>
               </div>
           </div>
       </section>
@@ -257,5 +316,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
