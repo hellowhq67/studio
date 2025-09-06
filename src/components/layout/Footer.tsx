@@ -5,8 +5,8 @@ import { Input } from '../ui/input';
 
 const Logo = () => (
     <Link href="/" className="flex items-center gap-2">
-       <span className="text-3xl font-extrabold tracking-tight text-primary">EVQ</span>
-       <span className="font-semibold text-xl text-white">EVANIEGLOW</span>
+       <span className="text-3xl font-extrabold tracking-tight text-primary">Evanie</span>
+       <span className="font-semibold text-xl text-white">Glow</span>
     </Link>
 )
 
@@ -18,7 +18,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <Logo />
             <p className="text-sm text-gray-400 mt-4 max-w-sm">
-                Discover your radiance with EVANIEGLOW. We believe in the power of nature to reveal your natural beauty.
+                Discover your radiance with Evanie Glow. We believe in the power of nature to reveal your natural beauty.
             </p>
             <div className="flex space-x-4 mt-4">
                 <Link href="#" className="text-gray-400 hover:text-primary">f</Link>
@@ -54,12 +54,12 @@ export default function Footer() {
         </div>
         <div className="mt-8 border-t border-secondary/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
           <p className="text-center md:text-left text-gray-500">
-            &copy; {new Date().getFullYear()} EVANIEGLOW. All Rights Reserved.
+            &copy; {new Date().getFullYear()} Evanie Glow. All Rights Reserved.
           </p>
            <div className="flex items-center gap-4 mt-4 md:mt-0">
-             <img src="https://placehold.co/50x30/ffffff/000000?text=Visa" alt="Visa" />
-             <img src="https://placehold.co/50x30/ffffff/000000?text=MC" alt="Mastercard" />
-             <img src="https://placehold.co/50x30/ffffff/000000?text=Amex" alt="American Express" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/Visa.svg" alt="Visa" className="h-8" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/Mastercard.svg" alt="Mastercard" className="h-8" />
+             <img src="https://storage.googleapis.com/gemini-studio-assets/project-images/AmericanExpress.svg" alt="American Express" className="h-8" />
            </div>
         </div>
       </div>

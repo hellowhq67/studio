@@ -1,42 +1,106 @@
+
 'use server';
 
-import type { Role, User } from '@/lib/types';
+import type { Role, User, ShippingAddress } from '@/lib/types';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs } from "firebase/firestore"; 
+import { revalidatePath } from 'next/cache';
 
-// Mock user data store
-const mockUsers: { [key: string]: User } = {};
+export async function getUser(firebaseUid: string): Promise<User | null> {
+    try {
+        const userRef = doc(db, "users", firebaseUid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            return {
+                id: userSnap.id,
+                email: data.email,
+                name: data.name,
+                role: data.role || 'CUSTOMER',
+                shippingAddress: data.shippingAddress || null,
+            } as User;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        return null;
+    }
+}
+
 
 export async function getUserRole(firebaseUid: string): Promise<Role> {
-    // In a mock environment, we can assign roles based on some logic,
-    // or just default to CUSTOMER. For simplicity, we'll check a mock admin UID.
-    if (firebaseUid === 'admin_user_uid_placeholder') {
-        return 'ADMIN';
+    try {
+        const userRef = doc(db, "users", firebaseUid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            return userSnap.data().role || 'CUSTOMER';
+        } else {
+            // Default to CUSTOMER if no user document exists
+            return 'CUSTOMER';
+        }
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        return 'CUSTOMER'; // Default role on error
     }
-    // You could also check an email address for a mock admin
-    const user = mockUsers[firebaseUid];
-    if (user && user.email === 'admin@example.com') {
-      return 'ADMIN';
-    }
-    return user?.role || 'CUSTOMER';
 }
 
 export async function createUserInDb(data: { firebaseUid: string; email: string | null; name: string | null; }) {
-   if (!data.email) {
-     throw new Error("Email is required to create a user.");
-   }
-   if (mockUsers[data.firebaseUid]) {
-       // User already exists, do nothing
-       return;
+   if (!data.email || !data.firebaseUid) {
+     console.warn("Attempted to create user with missing email or UID.");
+     return;
    }
    
-   // In a real app, you might have specific logic to determine the role.
-   // For now, we'll make a specific email an admin for testing purposes.
-   const role = data.email === 'admin@example.com' ? 'ADMIN' : 'CUSTOMER';
-   
-   mockUsers[data.firebaseUid] = {
-       id: data.firebaseUid,
-       email: data.email,
-       name: data.name,
-       role: role,
-   };
-   console.log('Mock user created:', mockUsers[data.firebaseUid]);
+   try {
+        const userRef = doc(db, "users", data.firebaseUid);
+        const userSnap = await getDoc(userRef);
+
+        // Only create document if it doesn't already exist
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: data.email,
+                name: data.name,
+                role: 'CUSTOMER', // Default role for new users
+                createdAt: serverTimestamp(),
+            });
+            console.log("User created in Firestore:", data.firebaseUid);
+        } else {
+            console.log("User already exists in Firestore:", data.firebaseUid);
+        }
+
+   } catch(error) {
+     console.error("Error creating user in Firestore:", error);
+   }
+}
+
+export async function updateUserProfile(firebaseUid: string, data: { name: string; shippingAddress: ShippingAddress }) {
+    try {
+        const userRef = doc(db, 'users', firebaseUid);
+        
+        await updateDoc(userRef, {
+            name: data.name,
+            shippingAddress: data.shippingAddress
+        });
+
+        revalidatePath('/account');
+
+        return { success: true, message: 'Profile updated successfully!' };
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        return { success: false, message: `Database Error: ${errorMessage}` };
+    }
+}
+
+export async function getAllUsers(): Promise<User[]> {
+    try {
+        const usersCollection = collection(db, 'users');
+        const userSnapshot = await getDocs(usersCollection);
+        return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        return [];
+    }
 }

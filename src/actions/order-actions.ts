@@ -1,10 +1,47 @@
+
 'use server';
 
-import type { Order, OrderItemInput } from '@/lib/types';
+import type { Order, OrderItemInput, Product, User } from '@/lib/types';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, query, where, doc, getDoc, writeBatch, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-import { orders as mockOrders } from '@/lib/mock-data';
 
-let orders = [...mockOrders];
+// Helper to fetch product details for enrichment
+async function getProductDetails(productId: string): Promise<Product | null> {
+    try {
+        const productRef = doc(db, 'products', productId);
+        const productSnap = await getDoc(productRef);
+        if (productSnap.exists()) {
+            return { id: productSnap.id, ...productSnap.data() } as Product;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching product ${productId}:`, error);
+        return null;
+    }
+}
+
+// Helper to fetch user details for enrichment
+async function getUserDetails(userId: string): Promise<User | null> {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const user = { id: userSnap.id, ...userData } as User;
+            // Ensure timestamp is converted
+            if (user.createdAt && user.createdAt instanceof Timestamp) {
+                user.createdAt = user.createdAt.toDate().toISOString();
+            }
+            return user;
+        }
+         return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null, createdAt: new Date().toISOString() };
+    } catch (error) {
+        console.error(`Error fetching user ${userId}:`, error);
+        return { id: userId, name: 'Unknown User', email: 'unknown@example.com', role: 'CUSTOMER', shippingAddress: null, createdAt: new Date().toISOString() };
+    }
+}
+
 
 export async function createOrder(
   firebaseUid: string,
@@ -15,35 +52,38 @@ export async function createOrder(
   status: 'Processing' | 'Paid' | 'Failed' = 'Processing'
 ): Promise<Order | null> {
   try {
-    const orderId = `ord_${Date.now()}`;
+    const ordersCollection = collection(db, 'orders');
     
-    const newOrder: Order = {
-        id: orderId,
+    // Create the main order document
+    const newOrderRef = await addDoc(ordersCollection, {
         userId: firebaseUid,
-        total,
+        total: total,
         status,
         shippingAddress: JSON.stringify(shippingAddress),
-        transactionId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        items: items.map(item => ({
-            id: `item_${Date.now()}_${item.productId}`,
-            orderId: orderId,
+        transactionId: transactionId || null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    });
+
+    const batch = writeBatch(db);
+    const orderItemsCollection = collection(db, `orders/${newOrderRef.id}/items`);
+    
+    items.forEach(item => {
+        const itemRef = doc(orderItemsCollection);
+        batch.set(itemRef, {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
-            // In a real app, you'd fetch product details here
-            product: { id: item.productId, name: 'Mock Product', description: '', longDescription: '', price: item.price, category: 'Skincare', images: [], tags: [], rating: 4, reviewCount: 10, deliveryTime: '2 days', brand: 'Mock Brand', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-        })),
-        // In a real app, you'd fetch user details here
-        user: { id: firebaseUid, name: 'Mock User', email: 'user@example.com', role: 'CUSTOMER' }
-    };
+        });
+    });
 
-    orders.unshift(newOrder);
+    await batch.commit();
 
     revalidatePath('/account');
+    revalidatePath('/admin/orders');
     
-    return newOrder;
+    const createdOrderDoc = await getDoc(newOrderRef);
+    return { id: createdOrderDoc.id, ...createdOrderDoc.data() } as Order;
 
   } catch (error) {
     console.error('Error creating order:', error);
@@ -53,18 +93,63 @@ export async function createOrder(
 
 export async function getUserOrders(firebaseUid: string): Promise<any[]> {
     try {
-        const userOrders = orders.filter(o => o.userId === firebaseUid);
-        return JSON.parse(JSON.stringify(userOrders.map(o => ({...o, date: o.createdAt}))));
+        const ordersQuery = query(collection(db, 'orders'), where('userId', '==', firebaseUid));
+        const querySnapshot = await getDocs(ordersQuery);
+        
+        const orders = await Promise.all(querySnapshot.docs.map(async (orderDoc) => {
+            const orderData = orderDoc.data();
+            const itemsQuery = query(collection(db, `orders/${orderDoc.id}/items`));
+            const itemsSnapshot = await getDocs(itemsQuery);
+            
+            const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
+                const itemData = itemDoc.data();
+                const product = await getProductDetails(itemData.productId);
+                return {
+                    ...itemData,
+                    product: product || { name: 'Unknown Product', images: [] },
+                };
+            }));
+
+            return {
+                id: orderDoc.id,
+                ...orderData,
+                createdAt: orderData.createdAt.toDate().toISOString(),
+                items,
+            };
+        }));
+        
+        return JSON.parse(JSON.stringify(orders));
+
     } catch (error) {
         console.error("Failed to fetch user orders:", error);
         return [];
     }
 }
 
-export async function getAllOrders() {
+export async function getAllOrders(): Promise<any[]> {
   try {
-     const allOrders = orders;
-     return JSON.parse(JSON.stringify(allOrders.map(o => ({...o, date: o.createdAt}))));
+     const ordersQuery = query(collection(db, 'orders'));
+     const querySnapshot = await getDocs(ordersQuery);
+
+     const orders = await Promise.all(querySnapshot.docs.map(async (orderDoc) => {
+         const orderData = orderDoc.data();
+         
+         const user = await getUserDetails(orderData.userId);
+         
+         const itemsQuery = query(collection(db, `orders/${orderDoc.id}/items`));
+         const itemsSnapshot = await getDocs(itemsQuery);
+         const items = itemsSnapshot.docs.map(doc => doc.data());
+
+         return {
+             id: orderDoc.id,
+             ...orderData,
+             createdAt: orderData.createdAt.toDate().toISOString(),
+             user: user || { name: 'Unknown User', email: '' },
+             items: items
+         };
+     }));
+
+     return JSON.parse(JSON.stringify(orders));
   } catch (error) {
     console.error("Failed to fetch all orders:", error);
     return [];

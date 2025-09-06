@@ -10,17 +10,59 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getUserOrders } from '@/actions/order-actions';
-import type { Order } from '@/lib/types';
+import { updateUserProfile } from '@/actions/user-actions';
+import type { Order, ShippingAddress } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
+
+const profileSchema = z.object({
+  name: z.string().min(2, 'Name is required'),
+  address: z.string().min(3, 'Address is required'),
+  city: z.string().min(2, 'City is required'),
+  state: z.string().min(2, 'State is required'),
+  zip: z.string().min(3, 'ZIP code is required'),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function AccountPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading, updateUserDisplayName } = useAuth();
   const { formatPrice } = useCurrency();
+  const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: user?.displayName || '',
+      address: user?.shippingAddress?.address || '',
+      city: user?.shippingAddress?.city || '',
+      state: user?.shippingAddress?.state || '',
+      zip: user?.shippingAddress?.zip || '',
+    },
+  });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.displayName || '',
+        address: user.shippingAddress?.address || '',
+        city: user.shippingAddress?.city || '',
+        state: user.shippingAddress?.state || '',
+        zip: user.shippingAddress?.zip || '',
+      });
+    }
+  }, [user, reset]);
+
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
@@ -31,20 +73,59 @@ export default function AccountPage() {
     const fetchOrders = async () => {
       if (user) {
         try {
+          setLoadingOrders(true);
           const userOrders = await getUserOrders(user.uid);
-           setOrders(userOrders);
+          setOrders(userOrders);
         } catch (error) {
           console.error('Error fetching orders:', error);
         } finally {
-          setLoading(false);
+          setLoadingOrders(false);
         }
       } else {
-        setLoading(false);
+        setLoadingOrders(false);
       }
     };
 
     fetchOrders();
   }, [user]);
+
+  const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+        const shippingAddress: ShippingAddress = {
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zip: data.zip
+        }
+        
+        // Update Firestore
+        const dbResult = await updateUserProfile(user.uid, { name: data.name, shippingAddress });
+
+        if (!dbResult.success) {
+            throw new Error(dbResult.message);
+        }
+        
+        // Update Firebase Auth profile
+        await updateUserDisplayName(data.name);
+
+        toast({
+            title: 'Profile Updated',
+            description: 'Your information has been saved successfully.',
+        });
+
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Update Failed',
+            description: error.message || 'There was a problem saving your profile.',
+        });
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -72,7 +153,7 @@ export default function AccountPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {loading ? (
+                  {loadingOrders ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center">Loading orders...</TableCell>
                     </TableRow>
@@ -98,65 +179,75 @@ export default function AccountPage() {
         </TabsContent>
         <TabsContent value="profile">
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Manage your personal and shipping details.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form className="space-y-8">
-                     <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
-                            <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
-                            <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <h3 className="text-lg font-semibold">{user?.displayName}</h3>
-                            <p className="text-sm text-muted-foreground">{user?.email}</p>
-                        </div>
-                    </div>
-                    <Separator />
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" defaultValue={user?.displayName || ''} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
-                             <p className="text-xs text-muted-foreground">Email address cannot be changed.</p>
-                        </div>
-                    </div>
-                     <div>
-                        <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
-                        <div className="space-y-4">
-                             <div className="space-y-2">
-                                <Label htmlFor="address">Address</Label>
-                                <Input id="address" placeholder="123 Beauty Lane" />
-                            </div>
-                            <div className="grid md:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="city">City</Label>
-                                    <Input id="city" placeholder="Glamour City" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="state">State</Label>
-                                    <Input id="state" placeholder="CA" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="zip">ZIP Code</Label>
-                                    <Input id="zip" placeholder="90210" />
-                                </div>
+             <form onSubmit={handleSubmit(onSubmit)}>
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>Manage your personal and shipping details.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-8">
+                         <div className="flex items-center gap-4">
+                            <Avatar className="h-16 w-16">
+                                <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                                <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <h3 className="text-lg font-semibold">{user?.displayName}</h3>
+                                <p className="text-sm text-muted-foreground">{user?.email}</p>
                             </div>
                         </div>
+                        <Separator />
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Full Name</Label>
+                                <Input id="name" {...register('name')} />
+                                {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email Address</Label>
+                                <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
+                                 <p className="text-xs text-muted-foreground">Email address cannot be changed.</p>
+                            </div>
+                        </div>
+                         <div>
+                            <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+                            <div className="space-y-4">
+                                 <div className="space-y-2">
+                                    <Label htmlFor="address">Address</Label>
+                                    <Input id="address" {...register('address')} placeholder="123 Beauty Lane" />
+                                    {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+                                </div>
+                                <div className="grid md:grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="city">City</Label>
+                                        <Input id="city" {...register('city')} placeholder="Glamour City" />
+                                        {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="state">State</Label>
+                                        <Input id="state" {...register('state')} placeholder="CA" />
+                                        {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="zip">ZIP Code</Label>
+                                        <Input id="zip" {...register('zip')} placeholder="90210" />
+                                        {errors.zip && <p className="text-sm text-destructive">{errors.zip.message}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-                <div className="flex justify-end gap-2 w-full">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Save Changes</Button>
-                </div>
-            </CardFooter>
+                </CardContent>
+                <CardFooter className="border-t px-6 py-4">
+                    <div className="flex justify-end gap-2 w-full">
+                        <Button type="button" variant="outline" onClick={() => reset()}>Cancel</Button>
+                        <Button type="submit" disabled={isSaving}>
+                           {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                           {isSaving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </div>
+                </CardFooter>
+            </form>
           </Card>
         </TabsContent>
       </Tabs>

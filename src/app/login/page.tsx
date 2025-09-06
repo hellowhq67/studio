@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,12 +11,12 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -40,10 +41,10 @@ const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function LoginPage() {
-  const { login, signInWithGoogle, loading } = useAuth();
-  const router = useRouter();
+  const { login, signInWithGoogle, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -55,16 +56,18 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    setFormLoading(true);
     try {
       await login(data.email, data.password);
       toast({ title: "Login Successful", description: "Welcome back!" });
-      router.push('/account');
+      // Redirect handled by useAuth hook
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
         description: error.message || 'An unexpected error occurred.',
       });
+       setFormLoading(false);
     }
   };
 
@@ -73,7 +76,7 @@ export default function LoginPage() {
     try {
       await signInWithGoogle();
       toast({ title: "Login Successful", description: "Welcome!" });
-      router.push('/account');
+      // Redirect handled by useAuth hook
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -84,12 +87,14 @@ export default function LoginPage() {
         setGoogleLoading(false);
     }
   };
+  
+  const isLoading = authLoading || formLoading || googleLoading;
 
   return (
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
       <Card className="w-full max-w-md bg-transparent border-0 shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-4xl mb-2 text-primary">EVANIEGLOW</CardTitle>
+          <CardTitle className="font-headline text-4xl mb-2 text-primary">EVANIE GLOW</CardTitle>
           <CardDescription className="text-muted-foreground">Welcome back! Please enter your details.</CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -144,8 +149,8 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full h-12 text-lg bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" className="w-full h-12 text-lg bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+                {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign in now
                 <ArrowRight className="ml-2 h-5 w-5"/>
               </Button>
@@ -154,7 +159,7 @@ export default function LoginPage() {
                 <span className="mx-4 text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1 bg-border/50" />
               </div>
-              <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50" onClick={handleGoogleSignIn} disabled={googleLoading}>
+              <Button variant="outline" className="w-full h-12 border-border/50 bg-input text-foreground hover:bg-muted/50" onClick={handleGoogleSignIn} disabled={isLoading}>
                 {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5"/>}
                 Sign in with Google
               </Button>

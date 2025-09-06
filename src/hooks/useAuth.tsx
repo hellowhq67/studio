@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
@@ -14,8 +15,10 @@ import {
 } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
-import type { Role } from '@/lib/types';
-import { getUserRole, createUserInDb } from '@/actions/user-actions';
+import type { Role, ShippingAddress } from '@/lib/types';
+import { getUser, createUserInDb } from '@/actions/user-actions';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
@@ -26,48 +29,77 @@ export interface AppUser {
     displayName: string | null;
     photoURL: string | null;
     role: Role;
+    shippingAddress: ShippingAddress | null;
 }
 
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signup: (email: string, password: string, displayName: string) => Promise<any>;
-  login: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
-  logout: () => Promise<any>;
+  signup: (email: string, password: string, displayName: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
+  updateUserDisplayName: (name: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const setAuthCookies = (user: FirebaseUser, role: Role) => {
+    Cookies.set('user_role', role, { expires: 7, path: '/' });
+    user.getIdToken().then(token => {
+        Cookies.set('auth_token', token, { expires: 7, path: '/' });
+    })
+};
+
+const clearAuthCookies = () => {
+    Cookies.remove('user_role', { path: '/' });
+    Cookies.remove('auth_token', { path: '/' });
+};
+
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const fetchUserRoleAndSetUser = useCallback(async (firebaseUser: FirebaseUser) => {
-      const role = await getUserRole(firebaseUser.uid);
-      setUser({
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        role: role,
-      });
+  const fetchUserAndSet = useCallback(async (firebaseUser: FirebaseUser): Promise<AppUser | null> => {
+      const appUser = await getUser(firebaseUser.uid);
+      if (appUser) {
+        const fullUser: AppUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          role: appUser.role,
+          shippingAddress: appUser.shippingAddress || null
+        };
+        setUser(fullUser);
+        setAuthCookies(firebaseUser, fullUser.role);
+        return fullUser;
+      }
+      return null;
   }, []);
 
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        await fetchUserRoleAndSetUser(firebaseUser);
+        await fetchUserAndSet(firebaseUser);
       } else {
         setUser(null);
+        clearAuthCookies();
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [fetchUserRoleAndSetUser]);
+  }, [fetchUserAndSet]);
   
+  const handleAuthSuccess = async (firebaseUser: FirebaseUser) => {
+    const appUser = await fetchUserAndSet(firebaseUser);
+    router.push('/admin');
+  };
+
   const signup = useCallback(async (email: string, password: string, displayName: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     if (userCredential.user) {
@@ -77,28 +109,35 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: userCredential.user.email,
             name: displayName,
         });
-        await fetchUserRoleAndSetUser(userCredential.user);
+        await handleAuthSuccess(userCredential.user);
     }
-    return userCredential;
-  }, [fetchUserRoleAndSetUser]);
+  }, [fetchUserAndSet, router]);
 
   const login = useCallback(async (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  }, []);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    if(userCredential.user) {
+        await handleAuthSuccess(userCredential.user);
+    }
+  }, [fetchUserAndSet, router]);
 
   const signInWithGoogle = useCallback(async () => {
     const userCredential = await signInWithPopup(auth, googleProvider);
     if (userCredential.user) {
-        // This function also handles creating the user in the DB if they don't exist
         await createUserInDb({
             firebaseUid: userCredential.user.uid,
             email: userCredential.user.email,
             name: userCredential.user.displayName,
         });
-       await fetchUserRoleAndSetUser(userCredential.user);
+       await handleAuthSuccess(userCredential.user);
     }
-    return userCredential;
-  }, [fetchUserRoleAndSetUser]);
+  }, [fetchUserAndSet, router]);
+
+  const updateUserDisplayName = useCallback(async (name: string) => {
+    if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name });
+        await fetchUserAndSet(auth.currentUser);
+    }
+  }, [fetchUserAndSet]);
 
 
   const logout = useCallback(async () => {
@@ -112,9 +151,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login,
     signInWithGoogle,
     logout,
-  }), [user, loading, signup, login, signInWithGoogle, logout]);
+    updateUserDisplayName
+  }), [user, loading, signup, login, signInWithGoogle, logout, updateUserDisplayName]);
   
-  if (loading && !user) {
+  if (loading) {
      return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
